@@ -1,0 +1,826 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.U. - Carrinho</title>
+    <style>
+        /* ================= RESET & VARIÁVEIS ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --gradient-top: #CDE3FB;
+            --gradient-bottom: #FFF7EB;
+            --text-main: #1A1A1A;
+            --text-muted: #757575;
+            --bg-body: #FFFFFF;
+            --bg-item: #F5F1EB;
+            --bg-footer: #345E3D;
+            --border-light: #EAEAEA;
+            --btn-dark: #2E5339;
+            --btn-outline: #FFFFFF;
+            --danger: #E25822;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ================= HEADER ================= */
+        .cart-header-wrapper {
+            background: linear-gradient(to bottom, var(--gradient-top) 0%, var(--gradient-bottom) 100%);
+            padding-bottom: 40px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        nav {
+            display: flex;
+            gap: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            align-items: center;
+        }
+
+        nav a {
+            transition: opacity 0.2s;
+        }
+
+        nav a:hover {
+            opacity: 0.7;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 42px;
+            font-weight: 500;
+            margin-top: 20px;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        main {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 40px auto 80px auto;
+            padding: 0 20px;
+        }
+
+        /* ESTADO VAZIO */
+        #empty-state {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        #empty-state h2 {
+            font-size: 24px;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        #empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        /* LISTA DE ITENS DO CARRINHO */
+        .cart-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .cart-item {
+            display: flex;
+            background-color: var(--bg-item);
+            border-radius: 12px;
+            padding: 15px 20px;
+            align-items: center;
+            position: relative;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .item-img-wrapper {
+            width: 60px;
+            height: 60px;
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .item-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .item-details p {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Controles do Item */
+        .item-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #A0A0A0;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .remove-btn:hover {
+            color: var(--text-main);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            background-color: #E8E4DF;
+            border-radius: 20px;
+            padding: 4px 12px;
+            gap: 15px;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estilização do Input de Quantidade */
+        .qty-input {
+            font-size: 13px;
+            font-weight: 600;
+            width: 30px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        /* Remove as setinhas padrão do input number (Chrome, Safari, Edge, Opera) */
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Remove as setinhas padrão do input number (Firefox) */
+        .qty-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* ================= SEÇÃO DE RESUMO & CUPOM ================= */
+        .cart-summary {
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-row.total {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            text-transform: none;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        .summary-row.discount-row {
+            color: var(--bg-footer);
+            display: none;
+        }
+
+        /* Cupom */
+        .coupon-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            max-width: 300px;
+        }
+
+        .coupon-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .btn-apply {
+            background-color: var(--text-main);
+            color: #FFF;
+            border: none;
+            border-radius: 6px;
+            padding: 0 15px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* ================= EXTRAS (RETIRADA E IFOOD) ================= */
+        .extras-section {
+            margin-bottom: 40px;
+        }
+
+        .extras-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .pickup-inputs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .date-input, .time-input {
+            padding: 10px 15px;
+            border: 1px solid #C0C0C0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            flex: 1;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .ifood-link {
+            display: inline-block;
+            margin-top: 5px;
+            transition: transform 0.2s;
+        }
+
+        .ifood-link:hover {
+            transform: scale(1.05);
+        }
+
+        .ifood-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #EA1D2C;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(234, 29, 44, 0.3);
+        }
+
+        /* ================= BOTÕES FINAIS ================= */
+        .cart-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background-color: var(--btn-outline);
+            border: 1px solid #A0A0A0;
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: #F8F9FA;
+            border-color: var(--text-main);
+        }
+
+        .btn-filled {
+            background-color: var(--btn-dark);
+            border: 1px solid var(--btn-dark);
+            color: #FFFFFF;
+        }
+
+        .btn-filled:hover {
+            opacity: 0.9;
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background-color: var(--bg-footer);
+            color: #FFFFFF;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 11px;
+            margin-top: auto;
+        }
+
+        .footer-left p { margin-bottom: 3px; }
+        .footer-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 16px;
+        }
+        .social-icons a {
+            color: #FFFFFF;
+            transition: opacity 0.3s;
+        }
+        .social-icons a:hover { opacity: 0.7; }
+
+        /* ================= RESPONSIVIDADE ================= */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            .cart-actions {
+                flex-direction: column-reverse;
+            }
+            footer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+            }
+            .footer-right { align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cart-header-wrapper">
+        <header>
+            <div class="logo">M.E.U.</div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="sobre.html">Sobre</a>
+                <a href="ajuda.html">Ajuda</a>
+                <a href="#" id="cart-nav-count">Carrinho (0)</a>
+                <a href="reserva-status.html">Acompanhar Reserva</a>
+                <a href="login.html" id="authLink">Entrar ➔</a>
+            </nav>
+        </header>
+        <h1 class="page-title">Carrinho</h1>
+    </div>
+
+    <main>
+        <div id="empty-state">
+            <h2>Seu carrinho está vazio.</h2>
+            <p>Parece que você ainda não adicionou nenhum produto.</p>
+            <button class="btn btn-filled" style="max-width: 200px; margin: 0 auto;" onclick="window.location.href='catalogo.html'">Explorar produtos</button>
+        </div>
+
+        <div id="cart-content">
+            <div class="cart-items-container" id="cart-items-container">
+            </div>
+
+            <div class="coupon-section">
+                <input type="text" id="coupon-input" class="coupon-input" placeholder="Cupom de desconto">
+                <button class="btn-apply" onclick="applyCoupon()">Aplicar</button>
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">R$ 0,00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Taxa de Serviço</span>
+                    <span id="summary-tax">R$ 0,00</span>
+                </div>
+                <div class="summary-row discount-row" id="discount-row">
+                    <span>Desconto Aplicado</span>
+                    <span id="summary-discount">- R$ 0,00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="summary-total">R$ 0,00</span>
+                </div>
+            </div>
+
+            <div class="extras-section">
+                <p class="extras-title">Selecione o dia e hora para retirar: (opcional)</p>
+                <div class="pickup-inputs">
+                    <input type="date" class="date-input" id="pickup-date">
+                    <input type="time" class="time-input" id="pickup-time">
+                </div>
+
+                <p class="extras-title">Gostaria que fosse entregue? peça pelo iFood:</p>
+                <a href="#" class="ifood-link" title="Pedir pelo iFood">
+                    <div class="ifood-icon">iF</div>
+                </a>
+            </div>
+
+            <div class="cart-actions">
+                <button class="btn btn-outline" onclick="goToCheckout()">Finalizar Reserva ➔</button>
+                <button class="btn btn-filled" onclick="window.location.href='catalogo.html'">Continuar Comprando</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <p>Copyright © 2026 meu.com.br LTDA.</p>
+            <p>CNPJ: 00.000.000/0000-00</p>
+        </div>
+        <div class="footer-right">
+            <p>© 2026 - Todos os direitos reservados</p>
+            <div class="social-icons">
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="X / Twitter">𝕏</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // ================= CONFIGURAÇÃO FIREBASE =================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+            authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+            projectId: "mercadinhomeu-1b712",
+            storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+            messagingSenderId: "677347106817",
+            appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ================= STATE =================
+        let currentUser = null;
+        let cart = [];
+        let appliedCoupon = null;
+        const TAX_FEE = 0.00; 
+
+        // ================= DOM ELEMENTS =================
+        const authLink = document.getElementById('authLink');
+        const cartContentDiv = document.getElementById('cart-content');
+        const emptyStateDiv = document.getElementById('empty-state');
+        const itemsContainer = document.getElementById('cart-items-container');
+        const navCount = document.getElementById('cart-nav-count');
+        
+        const elSubtotal = document.getElementById('summary-subtotal');
+        const elTax = document.getElementById('summary-tax');
+        const elTotal = document.getElementById('summary-total');
+        const elDiscountRow = document.getElementById('discount-row');
+        const elDiscountVal = document.getElementById('summary-discount');
+        
+        const inputCoupon = document.getElementById('coupon-input');
+        const inputDate = document.getElementById('pickup-date');
+        const inputTime = document.getElementById('pickup-time');
+
+        // ================= INIT / SESSÃO =================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                authLink.textContent = "Sair ➔";
+                authLink.href = "#";
+                authLink.onclick = (e) => {
+                    e.preventDefault();
+                    signOut(auth).then(() => {
+                        localStorage.removeItem('cart');
+                        window.location.reload();
+                    });
+                };
+                await loadCartFromFirebase();
+            } else {
+                currentUser = null;
+                authLink.textContent = "Entrar ➔";
+                authLink.href = "login.html";
+                authLink.onclick = null;
+                
+                const localCart = localStorage.getItem('cart');
+                cart = localCart ? JSON.parse(localCart) : [];
+                updateUI();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedDate = localStorage.getItem('pickupDate');
+            const savedTime = localStorage.getItem('pickupTime');
+            if(savedDate) inputDate.value = savedDate;
+            if(savedTime) inputTime.value = savedTime;
+        });
+
+        // ================= FIREBASE INTEGRATION =================
+        async function loadCartFromFirebase() {
+            if (!currentUser) return;
+            try {
+                const cartRef = doc(db, "carts", currentUser.uid);
+                const cartSnap = await getDoc(cartRef);
+                
+                if (cartSnap.exists()) {
+                    cart = cartSnap.data().items || [];
+                } else {
+                    await setDoc(cartRef, { items: [] });
+                    cart = [];
+                }
+                updateUI();
+            } catch (e) {
+                console.error("Erro ao ler dados do Firestore", e);
+                cart = [];
+                updateUI();
+            }
+        }
+
+        async function saveCart() {
+            if (currentUser) {
+                try {
+                    const cartRef = doc(db, "carts", currentUser.uid);
+                    await setDoc(cartRef, { items: cart }, { merge: true });
+                } catch (e) {
+                    console.error("Erro ao salvar no Firestore", e);
+                }
+            } else {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+        }
+
+        // ================= RENDER =================
+        function updateUI() {
+            updateNavCount();
+            
+            if (cart.length === 0) {
+                cartContentDiv.style.display = 'none';
+                emptyStateDiv.style.display = 'block';
+                return;
+            }
+
+            cartContentDiv.style.display = 'block';
+            emptyStateDiv.style.display = 'none';
+            
+            renderItems();
+            calculateTotals();
+        }
+
+        function updateNavCount() {
+            const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+            navCount.textContent = `Carrinho (${totalItems})`;
+        }
+
+        function renderItems() {
+            itemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                
+                itemDiv.innerHTML = `
+                    <div class="item-img-wrapper">
+                        <img src="${item.image || 'https://via.placeholder.com/60'}" alt="${item.name}">
+                    </div>
+                    <div class="item-details">
+                        <h4>${item.name}</h4>
+                        <p>${formatCurrency(item.price)}</p>
+                    </div>
+                    <div class="item-controls">
+                        <button class="remove-btn" onclick="window.removeItem('${item.id}')" title="Remover item">✕</button>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="window.updateQuantity('${item.id}', -1)">-</button>
+                            <input type="number" class="qty-input" value="${item.quantity}" min="1" onchange="window.handleQuantityInput('${item.id}', this.value)">
+                            <button class="qty-btn" onclick="window.updateQuantity('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                itemsContainer.appendChild(itemDiv);
+            });
+        }
+
+        // ================= EVENTS =================
+        async function updateQuantity(id, change) {
+            const itemIndex = cart.findIndex(i => i.id === id);
+            if (itemIndex > -1) {
+                cart[itemIndex].quantity += change;
+                
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+                
+                updateUI();
+                await saveCart();
+            }
+        }
+
+        async function handleQuantityInput(id, value) {
+            const itemIndex = cart.findIndex(i => i.id === id);
+            if (itemIndex > -1) {
+                const newQty = parseInt(value, 10);
+                
+                // Se o valor for inválido, menor ou igual a 0, remove o item
+                if (isNaN(newQty) || newQty <= 0) {
+                    cart.splice(itemIndex, 1);
+                } else {
+                    cart[itemIndex].quantity = newQty;
+                }
+                
+                updateUI();
+                await saveCart();
+            }
+        }
+
+        async function removeItem(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateUI();
+            await saveCart();
+        }
+
+        function applyCoupon() {
+            const code = inputCoupon.value.trim().toUpperCase();
+            
+            if (!code) {
+                alert("Por favor, digite um cupom.");
+                return;
+            }
+
+            if (code === 'FRETE10') {
+                appliedCoupon = { code: 'FRETE10', discountPercent: 10 };
+                alert("Cupom FRETE10 aplicado com sucesso! (10% de desconto)");
+            } else if (code === 'MEU20') {
+                appliedCoupon = { code: 'MEU20', discountPercent: 20 };
+                alert("Cupom MEU20 aplicado com sucesso! (20% de desconto)");
+            } else {
+                appliedCoupon = null;
+                alert("Cupom inválido ou expirado.");
+            }
+            
+            inputCoupon.value = '';
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            let discountValue = 0;
+            
+            if (appliedCoupon) {
+                discountValue = subtotal * (appliedCoupon.discountPercent / 100);
+                elDiscountRow.style.display = 'flex';
+                elDiscountVal.textContent = `- ${formatCurrency(discountValue)}`;
+            } else {
+                elDiscountRow.style.display = 'none';
+            }
+
+            const total = (subtotal - discountValue) + TAX_FEE;
+
+            elSubtotal.textContent = formatCurrency(subtotal);
+            elTax.textContent = formatCurrency(TAX_FEE);
+            elTotal.textContent = formatCurrency(total);
+        }
+
+        // 🚨 FUNÇÃO MODIFICADA PARA LIMPAR O CARRINHO 🚨
+        async function goToCheckout() {
+            if (cart.length === 0) {
+                alert("Seu carrinho está vazio! Adicione produtos antes de finalizar.");
+                return;
+            }
+
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            const discountValue = appliedCoupon ? subtotal * (appliedCoupon.discountPercent / 100) : 0;
+            const total = (subtotal - discountValue) + TAX_FEE;
+
+            const isoPickupDateTime = (inputDate.value && inputTime.value) 
+                ? `${inputDate.value}T${inputTime.value}:00` 
+                : null;
+
+            const checkoutData = {
+                userId: currentUser ? currentUser.uid : 'guest',
+                cart: cart,
+                subtotal: subtotal,
+                tax: TAX_FEE,
+                discount: discountValue,
+                total: total,
+                pickupDateTime: isoPickupDateTime,
+                coupon: appliedCoupon
+            };
+
+            // 1. Salva as informações necessárias para a tela de checkout funcionar
+            localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+            if(inputDate.value) localStorage.setItem('pickupDate', inputDate.value);
+            if(inputTime.value) localStorage.setItem('pickupTime', inputTime.value);
+
+            // 2. LIMPEZA TOTAL DO CARRINHO (Local e Firebase)
+            localStorage.removeItem('cart'); // Limpa o carrinho local
+
+            if (currentUser) {
+                try {
+                    const cartRef = doc(db, "carts", currentUser.uid);
+                    await setDoc(cartRef, { items: [] }); // Limpa o carrinho na nuvem (Firestore)
+                } catch (e) {
+                    console.error("Erro ao limpar carrinho no Firestore antes do checkout:", e);
+                }
+            }
+
+            // 3. Redireciona para a página de checkout
+            window.location.href = 'checkout.html';
+        }
+
+        // ================= HELPERS =================
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // ================= EXPOSIÇÃO GLOBAL =================
+        window.removeItem = removeItem;
+        window.updateQuantity = updateQuantity;
+        window.handleQuantityInput = handleQuantityInput;
+        window.applyCoupon = applyCoupon;
+        window.goToCheckout = goToCheckout;
+
+    </script>
+</body>
+</html>

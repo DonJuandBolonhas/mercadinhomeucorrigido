@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.U. - O melhor mercadinho da região</title>
+    <style>
+        /* ================= Reset e Variáveis ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --bg-blue: #CDE3FB;
+            --bg-beige: #FFF7EB;
+            --green: #386A46;
+            --green-footer: #3A6343;
+            --dark: #1A1A1A;
+            --border: #EAEAEA;
+        }
+
+        body {
+            background: #fff;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: .25s;
+        }
+
+        /* ================= Wrapper de Fundo ================= */
+        /* Cria o gradiente fluido que engloba do Header até o Hero */
+        .top-gradient {
+            background: linear-gradient(180deg, var(--bg-blue) 0%, var(--bg-blue) 20%, var(--bg-beige) 100%);
+        }
+
+        /* ================= HEADER ================= */
+        header {
+            padding: 22px 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-blue); /* Fundo sólido ao "grudar" no topo */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            opacity: .65;
+        }
+
+        nav a.auth-btn {
+            background: var(--green);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        nav a.auth-btn:hover {
+            background: #274d32;
+            opacity: 1;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* ================= HERO ================= */
+        .hero {
+            padding: 70px 20px 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            color: #111;
+        }
+
+        .hero strong {
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: #444;
+            margin-bottom: 45px;
+        }
+
+        .hero-banner {
+            width: 92%;
+            max-width: 980px;
+            margin: auto;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .10);
+            transition: .35s;
+        }
+
+        .hero-banner:hover {
+            transform: translateY(-6px);
+        }
+
+        .hero-banner img {
+            width: 100%;
+            display: block;
+        }
+
+        /* ================= PRODUTOS ================= */
+        .products-section {
+            padding: 90px 40px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .products-section h2 {
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 50px;
+            color: #222;
+        }
+
+        .products-container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+        }
+
+        .products-image {
+            flex: 1.2;
+        }
+
+        .products-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
+        }
+
+        .products-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-item {
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .product-item:first-child {
+            padding-top: 0;
+        }
+
+        .product-item h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .product-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .btn-catalogo {
+            margin-top: 30px;
+            background: var(--green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            transition: .3s;
+        }
+
+        .btn-catalogo:hover {
+            background: #274d32;
+            transform: translateY(-2px);
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: var(--green-footer);
+            color: white;
+            padding: 45px 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end; /* Alinha o conteúdo à base */
+            margin-top: 50px;
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .footer-left p {
+            opacity: .85;
+            font-size: 13px;
+        }
+
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+        }
+
+        .footer-right p {
+            opacity: .85;
+            font-size: 13px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .social-icons a {
+            background: transparent;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+
+        .social-icons a:hover {
+            opacity: 0.7;
+        }
+
+        /* ================= RESPONSIVO ================= */
+        @media(max-width: 900px) {
+            header {
+                padding: 15px 30px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            /* Menu Oculto no Mobile até ser ativado */
+            nav {
+                display: none; 
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-blue);
+                padding: 20px 0;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+                gap: 20px;
+            }
+
+            nav.active {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .products-container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .products-section {
+                padding: 60px 25px;
+            }
+
+            footer {
+                flex-direction: column-reverse;
+                gap: 30px;
+                text-align: center;
+                align-items: center;
+                padding: 40px 25px;
+            }
+
+            .footer-right, .footer-left {
+                align-items: center;
+            }
+            
+            .footer-right p {
+                display: none; /* Simplifica o mobile como na imagem */
+            }
+        }
+
+        @media(max-width: 550px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+            .hero p {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-gradient">
+        <header>
+            <div class="logo">M.E.U.</div>
+            
+            <button class="mobile-menu-btn" id="menuToggle">☰</button>
+
+            <nav id="navbar">
+                <a href="index.html">Home</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="sobre.html">Sobre</a>
+                <a href="ajuda.html">Ajuda</a>
+                <a href="carrinho.html">Carrinho (0)</a>
+                <a href="login.html" id="authLink" class="auth-btn">Entrar ➔</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1>Seja bem-vindo<br>ao <strong>M.E.U. !</strong></h1>
+                <p>O melhor mercadinho da região!</p>
+                
+                <div class="hero-banner">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80" alt="Banner M.E.U. Mercadinho">
+                </div>
+            </section>
+        </main>
+    </div> <section class="products-section">
+        <h2>Conheça nossos produtos</h2>
+        
+        <div class="products-container">
+            <div class="products-image">
+                <img src="https://images.unsplash.com/photo-1608686207856-001b95cf60ca?auto=format&fit=crop&w=600&q=80" alt="Cesta de alimentos frescos">
+            </div>
+            
+            <div class="products-list">
+                <div class="product-item">
+                    <h3>Alimentos</h3>
+                    <p>Frutas, verduras e muito mais</p>
+                </div>
+                <div class="product-item">
+                    <h3>Bebidas</h3>
+                    <p>Água, leite, suco de laranja e muito mais</p>
+                </div>
+                <div class="product-item">
+                    <h3>Casa</h3>
+                    <p>Papel toalha, sabão e muito mais</p>
+                </div>
+                <div class="product-item">
+                    <h3>Roupas</h3>
+                    <p>Camisetas, chinelos e muito mais</p>
+                </div>
+                
+                <a href="catalogo.html" class="btn-catalogo">+ Catálogo</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="sobre">
+        <div class="footer-left">
+            <p>Copyright © 2026 meu.com.br LTDA.</p>
+            <p>CNPJ: 00.000.000/0000-00</p>
+        </div>
+        <div class="footer-right">
+            <p>© 2026 - Todos os direitos reservados</p>
+            <div class="social-icons">
+                <a href="" title="Instagram"></a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="X / Twitter">𝕏</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            const navbar = document.getElementById('navbar');
+            if(menuToggle && navbar) {
+                menuToggle.addEventListener('click', () => {
+                    navbar.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+            authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+            projectId: "mercadinhomeu-1b712",
+            storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+            messagingSenderId: "677347106817",
+            appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const authLink = document.getElementById('authLink');
+        const navbar = document.getElementById('navbar');
+
+        // Monitora se há um usuário logado
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // ================= CORREÇÃO DO REDIRECIONAMENTO DE CHECKOUT =================
+                const checkoutData = localStorage.getItem('checkoutData');
+                if (checkoutData) {
+                    try {
+                        const parsedData = JSON.parse(checkoutData);
+                        if (parsedData && parsedData.cart && parsedData.cart.length > 0) {
+                            window.location.href = "checkout.html";
+                            return; 
+                        }
+                    } catch (e) {
+                        console.error("Erro ao ler dados pendentes de checkout:", e);
+                    }
+                }
+                // ============================================================================
+
+                authLink.textContent = "Sair ➔";
+                authLink.href = "#";
+
+                authLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    signOut(auth).then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error("Erro ao sair:", error);
+                    });
+                });
+
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        
+                        if (userData.role === 'funcionario' || userData.role === 'gerente' || user.email.includes('@coopmeu.com')) {
+                            
+                            if(!document.querySelector('a[href="funcionario.html"]')) {
+                                const funcLink = document.createElement('a');
+                                funcLink.href = "funcionario.html";
+                                funcLink.textContent = "Painel Funcionário";
+
+                                const pedidosLink = document.createElement('a');
+                                pedidosLink.href = "funcionario.html";
+                                pedidosLink.textContent = "Gerenciar Pedidos";
+
+                                navbar.insertBefore(funcLink, authLink);
+                                navbar.insertBefore(pedidosLink, authLink);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Erro ao validar perfil do usuário:", error);
+                }
+
+            } else {
+                authLink.textContent = "Entrar ➔";
+                authLink.href = "login.html";
+            }
+        });
+    </script>
+</body>
+</html>

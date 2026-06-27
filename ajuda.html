@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.U. - Central de Ajuda ao Cliente</title>
+    <style>
+        /* ================= RESET & VARIÁVEIS ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --bg-blue: #CDE3FB;
+            --bg-beige: #FFF7EB;
+            --green: #386A46;
+            --green-footer: #3A6343;
+            --dark: #1A1A1A;
+            --text-muted: #656565;
+            --border-light: #EAEAEA;
+            --bg-card: #F9F9F6;
+            --status-pending: #FBC02D;
+            --status-approved: #42A5F5;
+            --status-completed: #2E5339;
+            --status-cancelled: #E53935;
+        }
+
+        body {
+            background-color: #FFFFFF;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.25s;
+        }
+
+        /* ================= HEADER & NAV ================= */
+        header {
+            background-color: #FFFFFF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            margin-left: 25px;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        nav a:hover {
+            color: var(--green);
+        }
+
+        /* ================= HERO SECTION ================= */
+        .help-hero {
+            background: linear-gradient(180deg, var(--bg-blue) 0%, var(--bg-beige) 100%);
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .help-hero h1 {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .help-hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+        .help-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        /* CARD FLUXO DE COMPRA */
+        .flow-section {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid #E7E5DF;
+        }
+
+        .flow-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .steps-wrapper {
+            display: table;
+            width: 100%;
+            margin-top: 25px;
+        }
+
+        .step-item {
+            display: table-cell;
+            width: 16.66%;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--green);
+            color: white;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 10px auto;
+            line-height: 50px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* FAQ ACCORDION STYLE */
+        .faq-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--green);
+            padding-left: 12px;
+        }
+
+        .faq-item {
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 18px 20px;
+            background-color: #FAFBFD;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .faq-question:hover {
+            background-color: #F1F5F9;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            color: var(--text-muted);
+            font-size: 15px;
+            border-top: 0 solid transparent;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 18px 20px;
+            max-height: 500px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .faq-toggle-icon {
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-toggle-icon {
+            transform: rotate(45deg);
+        }
+
+        /* STATUS BADGES */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-pending { background-color: var(--status-pending); color: #000; }
+        .badge-approved { background-color: var(--status-approved); }
+        .badge-completed { background-color: var(--status-completed); }
+        .badge-cancelled { background-color: var(--status-cancelled); }
+
+        /* CONTACT CALLOUT */
+        .contact-callout {
+            background-color: #EBF3ED;
+            border: 1px solid #C2DCB7;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .contact-callout h3 {
+            color: var(--green);
+            margin-bottom: 8px;
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background-color: var(--green-footer);
+            color: #FFFFFF;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .footer-brand {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo"><a href="index.html">M.E.U.</a></div>
+        <nav>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="carrinho.html">Carrinho</a>
+            <a href="reserva-status.html">Minhas Reservas</a>
+            <a href="index.html">Sair</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="help-hero">
+        <h1>Como podemos ajudar?</h1>
+        <p>Encontre aqui as respostas para as principais dúvidas sobre o funcionamento do Mercadinho Universitário M.E.U.</p>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="help-container">
+
+        <!-- FLUXO DE RESERVA -->
+        <div class="flow-section">
+            <h2>O Fluxo do Seu Pedido</h2>
+            <p>Entenda o passo a passo desde a escolha do produto no nosso sistema até o momento da retirada física:</p>
+            
+            <div class="steps-wrapper">
+                <div class="step-item">
+                    <span class="step-icon">1</span>
+                    <div class="step-title">Catálogo</div>
+                    <div class="step-desc">Escolha seus produtos e clique em Reservar.</div>
+                </div>
+                <div class="step-item">
+                    <span class="step-icon">2</span>
+                    <div class="step-title">Carrinho</div>
+                    <div class="step-desc">Ajuste quantidades e defina o horário de retirada.</div>
+                </div>
+                <div class="step-item">
+                    <span class="step-icon">3</span>
+                    <div class="step-title">Checkout</div>
+                    <div class="step-desc">Faça login, compre como visitante e selecione o pagamento.</div>
+                </div>
+                <div class="step-item">
+                    <span class="step-icon">4</span>
+                    <div class="step-title">Análise</div>
+                    <div class="step-desc">A nossa equipa valida a reserva e separa o stock.</div>
+                </div>
+                <div class="step-item">
+                    <span class="step-icon">5</span>
+                    <div class="step-title">Retirada</div>
+                    <div class="step-desc">Compareça ao mercadinho no horário agendado.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ ACCORDION -->
+        <div class="faq-section">
+            <h2>Perguntas Frequentes (FAQ)</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Como funciona o sistema de reservas do M.E.U.?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    O M.E.U. funciona como um sistema de reserva prévia. Você navega pelo catálogo, adiciona os itens desejados ao carrinho, agenda o dia e horário que deseja buscar e finaliza o pedido. Dessa forma, garantimos que os seus produtos estarão guardados e separados esperando por você.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Posso comprar sem ter uma conta criada (como visitante)?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Sim! No momento do checkout você pode optar por realizar a reserva informando apenas o seu Nome, E-mail e Telefone para contacto, sem a necessidade de criar uma password. No entanto, criar uma conta permite acompanhar o histórico de todas as suas reservas anteriores.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>O que significa cada status da minha reserva?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>As suas reservas podem passar pelos seguintes estados:</p>
+                    <p style="margin-top: 10px;"><span class="badge badge-pending">Pendente</span> O seu pedido foi recebido e aguarda a separação pela nossa equipa.</p>
+                    <p style="margin-top: 5px;"><span class="badge badge-approved">Aprovada</span> Os produtos já foram separados e estão prontos para levantamento no horário agendado!</p>
+                    <p style="margin-top: 5px;"><span class="badge badge-completed">Concluída</span> Você já retirou os seus produtos e o pagamento foi efetuado com sucesso.</p>
+                    <p style="margin-top: 5px;"><span class="badge badge-cancelled">Cancelada</span> A reserva foi cancelada por você ou pela administração.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Onde e como faço o pagamento?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    O pagamento é selecionado durante o checkout digital (Pix, Cartão de Crédito/Débito ou Dinheiro), mas a transação final e a validação do pagamento ocorrem presencialmente no balcão de atendimento no momento em que você vai retirar os seus produtos.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Posso cancelar uma reserva ativa?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    Sim. Se a sua reserva ainda estiver nos estados <strong>Pendente</strong> ou <strong>Aprovada</strong>, você pode aceder à página "Minhas Reservas", clicar no botão de detalhes do pedido correspondente e selecionar a opção "Cancelar Reserva". Atenção: após cancelada, uma reserva não poderá voltar ao estado anterior.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>O que acontece se um produto ficar sem stock?</span>
+                    <span class="faq-toggle-icon">+</span>
+                </div>
+                <div class="faq-answer">
+                    O nosso sistema atualiza o catálogo em tempo real. Se o stock de um item chegar a zero, ele exibirá um selo de <strong>Indisponível</strong> e o botão de reserva ficará bloqueado, impedindo que novas reservas desse item sejam feitas até que ocorra a reposição.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CONTATO CALLOUT -->
+        <div class="contact-callout">
+            <h3>Ainda tem alguma dúvida ou teve algum problema com o seu pedido?</h3>
+            <p>Visite o balcão central do Mercadinho M.E.U. no campus ou envie uma mensagem para o suporte da Coorperativa Universitária.</p>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-brand">M.E.U.</div>
+        <p>Mercadinho Universitário — Gerido com amor pela Cooperativa de Alunos</p>
+        <p>&copy; 2026 M.E.U. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- INTERACTIVIDADE JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const item = question.parentElement;
+                    
+                    // Fecha outros se quiser comportamento de sanfona único (opcional)
+                    // document.querySelectorAll('.faq-item').forEach(i => { if(i !== item) i.classList.remove('active'); });
+
+                    item.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

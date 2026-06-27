@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Nós - M.E.U.</title>
+    <style>
+        /* ================= Reset e Variáveis ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --bg-blue: #CDE3FB;
+            --bg-beige: #FFF7EB;
+            --green: #386A46;
+            --green-footer: #3A6343;
+            --dark: #1A1A1A;
+            --border: #EAEAEA;
+            --card-bg: #F4F7FC;
+        }
+
+        body {
+            background: #fff;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: .25s;
+        }
+
+        /* Wrapper de Fundo fluido para o topo */
+        .top-gradient {
+            background: linear-gradient(180deg, var(--bg-blue) 0%, var(--bg-blue) 30%, #fff 100%);
+        }
+
+        /* ================= HEADER ================= */
+        header {
+            padding: 22px 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-blue);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            opacity: .65;
+        }
+
+        nav a.auth-btn {
+            background: var(--green);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        nav a.auth-btn:hover {
+            background: #274d32;
+            opacity: 1;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* ================= HERO BANNER ================= */
+        .hero-container {
+            padding: 20px 70px 40px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .about-banner {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .about-banner img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* ================= SEÇÃO NOSSOS VALORES ================= */
+        .values-section {
+            padding: 60px 70px;
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .values-section h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #111;
+        }
+
+        .values-grid {
+            display: flex;
+            gap: 24px;
+            justify-content: space-between;
+        }
+
+        .value-card {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 35px 25px;
+            border-radius: 16px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .value-card .icon-container {
+            width: 48px;
+            height: 48px;
+            color: #333;
+        }
+
+        .value-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .value-card p {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* ================= SEÇÃO LOCALIZAÇÃO ================= */
+        .localization-section {
+            padding: 60px 70px 80px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .localization-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 80px;
+        }
+
+        .localization-info {
+            flex: 1;
+        }
+
+        .localization-info h2 {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #111;
+        }
+
+        .localization-info p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        .map-box {
+            flex: 1.2;
+            height: 320px;
+            background-color: #E3F2FD;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+
+        /* ================= SEÇÃO CONTRATAÇÃO ================= */
+        .hiring-section {
+            background-color: #F8F9FA;
+            padding: 60px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hiring-section h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .btn-whatsapp {
+            background: #000000;
+            color: #ffffff;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            background: #222222;
+            transform: translateY(-2px);
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: var(--green-footer);
+            color: white;
+            padding: 45px 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .footer-left p {
+            opacity: .85;
+            font-size: 13px;
+        }
+
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 15px;
+        }
+
+        .footer-right p {
+            opacity: .85;
+            font-size: 13px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 18px;
+        }
+
+        .social-icons a:hover {
+            opacity: 0.7;
+        }
+
+        /* ================= RESPONSIVO ================= */
+        @media(max-width: 900px) {
+            header {
+                padding: 15px 30px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            nav {
+                display: none; 
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-blue);
+                padding: 20px 0;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+                gap: 20px;
+            }
+
+            nav.active {
+                display: flex;
+            }
+
+            .hero-container {
+                padding: 10px 20px;
+            }
+
+            .values-section, .localization-section {
+                padding: 40px 20px;
+            }
+
+            .values-grid {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .localization-container {
+                flex-direction: column;
+                gap: 40px;
+                text-align: left;
+            }
+
+            .localization-info h2 {
+                font-size: 32px;
+            }
+
+            .map-box {
+                width: 100%;
+                height: 260px;
+            }
+
+            footer {
+                flex-direction: column-reverse;
+                gap: 30px;
+                text-align: center;
+                align-items: center;
+                padding: 40px 25px;
+            }
+
+            .footer-right, .footer-left {
+                align-items: center;
+            }
+            
+            .footer-right p {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-gradient">
+        <header>
+            <div class="logo">M.E.U.</div>
+            <button class="mobile-menu-btn" id="menuToggle">☰</button>
+            <nav id="navbar">
+                <a href="index.html">Home</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="sobre.html">Sobre</a>
+                <a href="ajuda.html">Ajuda</a>
+                <a href="carrinho.html">Carrinho (0)</a>
+                <a href="login.html" id="authLink" class="auth-btn">Entrar ➔</a>
+            </nav>
+        </header>
+
+        <main class="hero-container">
+            <div class="about-banner">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80" alt="M.E.U. Mercadinho Banner">
+            </div>
+        </main>
+    </div>
+
+    <section class="values-section">
+        <h2>Nossos valores</h2>
+        <div class="values-grid">
+            
+            <div class="value-card">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 2v20M2 12h20"/>
+                        <path d="M12 12m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>
+                    </svg>
+                </div>
+                <h3>Qualidade</h3>
+                <p>Oferecer produtos confiáveis e bem selecionados todos os dias.</p>
+            </div>
+
+            <div class="value-card">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M3.6 9h16.8M3.6 15h16.8"/>
+                        <path d="M11.5 3a17 17 0 0 0 0 18M12.5 3a17 17 0 0 1 0 18"/>
+                    </svg>
+                </div>
+                <h3>Proximidade</h3>
+                <p>Atender com respeito, atenção e relacionamento próximo com os clientes.</p>
+            </div>
+
+            <div class="value-card">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 16 16 12 12 8"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                </div>
+                <h3>Transparência</h3>
+                <p>Praticar preços justos e agir com honestidade em todas as relações.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="localization-section">
+        <div class="localization-container">
+            <div class="localization-info">
+                <h2>Localização</h2>
+                <p>Estamos localizados Av. das Notas Altas, nº 100, Centro, Maringá/PR - CEP 10000-000.</p>
+            </div>
+            <div class="map-box">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#EA4335"/>
+                    <circle cx="12" cy="9" r="3" fill="#FFF"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <section class="hiring-section">
+        <h2>Estamos contratando!</h2>
+        <a href="#" class="btn-whatsapp">
+            <span>•</span> Contato via WhatsApp
+        </a>
+    </section>
+
+    <footer id="sobre">
+        <div class="footer-left">
+            <p>Copyright © 2026 meu.com.br LTDA.</p>
+            <p>CNPJ: 00.000.000/0000-00</p>
+        </div>
+        <div class="footer-right">
+            <p>© 2026 - Todos os direitos reservados</p>
+            <div class="social-icons">
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="LinkedIn">in</a>
+                <a href="#" title="X / Twitter">𝕏</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.getElementById('menuToggle');
+            const navbar = document.getElementById('navbar');
+            if(menuToggle && navbar) {
+                menuToggle.addEventListener('click', () => {
+                    navbar.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+            authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+            projectId: "mercadinhomeu-1b712",
+            storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+            messagingSenderId: "677347106817",
+            appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const authLink = document.getElementById('authLink');
+        const navbar = document.getElementById('navbar');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                authLink.textContent = "Sair ➔";
+                authLink.href = "#";
+
+                authLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    signOut(auth).then(() => {
+                        window.location.reload();
+                    }).catch((error) => {
+                        console.error("Erro ao sair:", error);
+                    });
+                });
+
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        const userData = userDocSnap.data();
+                        if (userData.role === 'funcionario' || userData.role === 'admin' || user.email.includes('@coopmeu.com')) {
+                            if(!document.querySelector('a[href="funcionario.html"]')) {
+                                const funcLink = document.createElement('a');
+                                funcLink.href = "funcionario.html";
+                                funcLink.textContent = "Painel Funcionário";
+
+                                const pedidosLink = document.createElement('a');
+                                pedidosLink.href = "visupedidos.html";
+                                pedidosLink.textContent = "Gerenciar Pedidos";
+
+                                navbar.insertBefore(funcLink, authLink);
+                                navbar.insertBefore(pedidosLink, authLink);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Erro ao validar perfil do usuário:", error);
+                }
+            } else {
+                authLink.textContent = "Entrar ➔";
+                authLink.href = "login.html";
+            }
+        });
+    </script>
+</body>
+</html>

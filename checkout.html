@@ -1,0 +1,1030 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.U. - Checkout</title>
+    <style>
+        /* ================= RESET & VARIÁVEIS ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --gradient-top: #CFE3FA;
+            --gradient-bottom: #F9F2E6;
+            --bg-card: #F6F5F2;
+            --bg-footer: #345E3D;
+            --text-main: #171717;
+            --text-muted: #8A8A8A;
+            --green: #285234;
+            --orange: #F57A41;
+            --blue: #4E95F2;
+            --border: #E7E5DF;
+            --danger: #E25822;
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--gradient-top) 0%, var(--gradient-bottom) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.35;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 34px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            align-items: center;
+        }
+
+        nav a:hover {
+            opacity: .70;
+        }
+
+        /* MAIN */
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 680px;
+            margin: 25px auto 70px;
+            padding: 0 18px;
+        }
+
+        .checkout-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: none;
+        }
+
+        .card-header {
+            font-size: 11px;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: #9A9A9A;
+            margin-bottom: 18px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ORDER */
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(0,0,0,.05);
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .item-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .item-qty {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .item-price {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-datetime {
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(0,0,0,.05);
+        }
+
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 22px;
+            font-weight: 500;
+            padding-top: 16px;
+        }
+
+        .order-total-row .label {
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* AUTH */
+        .auth-badge {
+            background: var(--green);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(0,0,0,.12);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        .form-control[readonly] {
+            background-color: #EFEFEF;
+            color: #555;
+            cursor: not-allowed;
+            border-color: rgba(0,0,0,.08);
+        }
+
+        .form-helper {
+            font-size: 11px;
+            margin-top: 4px;
+            color: var(--text-muted);
+        }
+
+        #guest-prompt,
+        #guest-form,
+        #logged-in-data {
+            display: none;
+        }
+
+        .guest-prompt-box {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px dashed rgba(0,0,0,.16);
+        }
+
+        .guest-prompt-box p {
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .logged-in-data {
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: underline;
+            padding: 0;
+            margin-top: 8px;
+        }
+
+        /* PAYMENT */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .pay-card {
+            min-height: 72px;
+            border-radius: 8px;
+            padding: 12px 14px;
+            opacity: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 5px;
+            position: relative;
+            border: none;
+            cursor: pointer;
+            transition: .18s ease;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pay-card:hover {
+            transform: translateY(-1px);
+        }
+
+        .pay-card.active {
+            transform: none;
+            outline: 3px solid rgba(255,255,255,.75);
+            box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+        }
+
+        .pay-card.active::after {
+            content: '✓';
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.30);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .bg-dinheiro { background: #02B32A; }
+        .bg-debit { background: #F57A41; }
+        .bg-credit { background: #4E95F2; }
+
+        .pay-hint {
+            font-size: 11px;
+            margin-top: 12px;
+            color: var(--text-muted);
+        }
+
+        /* TOTAL */
+        .final-total-box {
+            padding-top: 8px;
+        }
+
+        .final-total-box label {
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .total-display-input {
+            background: #EDE9E1;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 20px;
+            font-weight: 400;
+            width: fit-content;
+        }
+
+        /* BUTTONS */
+        .action-area {
+            display: flex;
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .btn {
+            height: 42px;
+            padding: 0 18px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: .20s;
+            width: 100%;
+        }
+
+        .btn-filled {
+            background: #264E33;
+            color: white;
+        }
+
+        .btn-filled:hover {
+            opacity: .90;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #BEBEBE;
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: #f8f8f8;
+        }
+
+        .btn-danger {
+            background: white;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #FFF5F2;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--danger);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transition: .35s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 390px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            border: none;
+            background: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg-footer);
+            color: white;
+            padding: 26px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 10px;
+            margin-top: auto;
+        }
+
+        .footer-left p {
+            margin-bottom: 3px;
+        }
+
+        .footer-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:600px){
+            header {
+                flex-direction: column;
+                gap: 14px;
+                padding: 20px;
+            }
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-area {
+                flex-direction: column-reverse;
+            }
+            footer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 18px;
+            }
+            .footer-right {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast-error">Erro de validação</div>
+
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeAuthModal()">×</button>
+            <h3>Identificação</h3>
+            <p>Para concluir sua reserva, escolha como deseja continuar:</p>
+            <div class="modal-actions" style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-filled" onclick="window.location.href='login.html'">Fazer Login</button>
+                <button class="btn btn-outline" onclick="proceedAsGuest()">Passar informações mínimas</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">M.E.U.</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="#">Sobre</a>
+            <a href="ajuda.html">Ajuda</a>
+            <a href="carrinho.html" id="cart-nav-count">Carrinho (0)</a>
+            <a href="login.html" id="nav-login">Entrar ➔</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="checkout-container">
+
+            <section class="card" id="block-summary">
+                <div class="card-header">Resumo do Pedido <span style="font-size: 18px;">🧾</span></div>
+                
+                <div id="order-items-container"></div>
+
+                <div class="order-datetime" id="order-pickup-container">
+                    <span>Data e horário de retirada</span>
+                    <strong id="el-pickup-date">-</strong>
+                </div>
+
+                <div class="order-total-row">
+                    <span class="label">Valor Total</span>
+                    <span id="el-summary-total">R$ 0,00</span>
+                </div>
+            </section>
+
+            <section class="card" id="block-customer">
+                <div class="card-header">
+                    Dados da Reserva
+                    <span class="auth-badge" id="badge-auth" style="display: none;">LOGADO</span>
+                </div>
+
+                <div id="guest-prompt" class="guest-prompt-box">
+                    <p>Precisamos de alguns dados para confirmar sua reserva.</p>
+                    <button class="btn btn-filled" style="max-width: 250px; margin: 0 auto;" onclick="openAuthModal()">Identificar-se</button>
+                </div>
+
+                <form id="guest-form">
+                    <div class="form-group">
+                        <label for="input-name">Nome Completo *</label>
+                        <input type="text" id="input-name" class="form-control" placeholder="Ex: João da Silva" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-phone">Telefone (WhatsApp) *</label>
+                        <input type="tel" id="input-phone" class="form-control" placeholder="(00) 00000-0000" required>
+                        <div class="form-helper">Usado para confirmar sua reserva.</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="input-email">E-mail (Opcional)</label>
+                        <input type="email" id="input-email" class="form-control" placeholder="exemplo@email.com">
+                    </div>
+                    
+                    <button type="button" class="btn-link" id="auth-toggle-btn">Voltar / Fazer Login</button>
+                </form>
+
+            </section>
+
+            <section class="card" id="block-payment">
+                <div class="card-header">Pagamento</div>
+                <p style="font-size: 12px; color: var(--text-muted);">Como você prefere pagar na retirada?</p>
+                
+                <div class="payment-grid">
+                    <div class="pay-card bg-dinheiro" data-method="Dinheiro" onclick="selectPayment('Dinheiro')">
+                        <span style="font-size: 20px;">💵</span>
+                        Dinheiro
+                    </div>
+                    <div class="pay-card bg-debit" data-method="Cartão de Débito" onclick="selectPayment('Cartão de Débito')">
+                        <span style="font-size: 20px;">💳</span>
+                        Débito
+                    </div>
+                    <div class="pay-card bg-credit" data-method="Cartão de Crédito" onclick="selectPayment('Cartão de Crédito')">
+                        <span style="font-size: 20px;">💳</span>
+                        Crédito
+                    </div>
+                </div>
+                <div class="pay-hint" id="pay-hint"></div>
+            </section>
+
+            <section class="card final-total-box" style="background-color: transparent; box-shadow: none; padding: 0;">
+                <label>Valor Total</label>
+                <div class="total-display-input" id="el-final-total">R$ 0,00</div>
+
+                <div class="action-area">
+                    <button class="btn btn-danger" style="flex: 0.4;" onclick="clearCheckout()">Limpar Checkout</button>
+                    <button class="btn btn-outline" style="flex: 0.4;" onclick="returnToCart()">Voltar ao Carrinho</button>
+                    <button class="btn btn-filled" style="flex: 1;" onclick="submitReservation()">Realizar Reserva ➔</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <p>Copyright © 2026 meu.com.br LTDA.</p>
+            <p>CNPJ: 00.000.000/0000-00</p>
+        </div>
+        <div class="footer-right">
+            <p>© 2026 - Todos os direitos reservados</p>
+            <div class="social-icons">
+                <a href="#">📷</a>
+                <a href="#">in</a>
+                <a href="#">𝕏</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        // =========================================================
+        // INTEGRAÇÃO FIREBASE (V9 Modular)
+        // =========================================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // ⚠️ ATENÇÃO: Substitua pelos dados reais do seu projeto Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+            authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+            projectId: "mercadinhomeu-1b712",
+            storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+            messagingSenderId: "677347106817",
+            appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+        };
+
+        // Inicialização do Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ================= CONFIG & STATE =================
+        let checkoutData = null;
+        let selectedPaymentMethod = null;
+        let currentUser = null; 
+        let isGuestFormVisible = false;
+
+        // ================= DOM ELEMENTS =================
+        const els = {
+            itemsContainer: document.getElementById('order-items-container'),
+            pickupDate: document.getElementById('el-pickup-date'),
+            summaryTotal: document.getElementById('el-summary-total'),
+            finalTotal: document.getElementById('el-final-total'),
+            navCount: document.getElementById('cart-nav-count'),
+            toastError: document.getElementById('toast-error'),
+
+            guestPrompt: document.getElementById('guest-prompt'),
+            guestForm: document.getElementById('guest-form'),
+            badgeAuth: document.getElementById('badge-auth'),
+            
+            inputName: document.getElementById('input-name'),
+            inputPhone: document.getElementById('input-phone'),
+            inputEmail: document.getElementById('input-email'),
+            authToggleBtn: document.getElementById('auth-toggle-btn'),
+
+            authModal: document.getElementById('auth-modal'),
+            payCards: document.querySelectorAll('.pay-card'),
+            payHint: document.getElementById('pay-hint')
+        };
+
+        // Expondo funções para o escopo global
+        window.closeAuthModal = closeAuthModal;
+        window.openAuthModal = openAuthModal;
+        window.proceedAsGuest = proceedAsGuest;
+        window.logoutApp = logoutApp;
+        window.selectPayment = selectPayment;
+        window.submitReservation = submitReservation;
+        window.clearCheckout = clearCheckout;
+        window.returnToCart = returnToCart; // EXPOSTA A NOVA FUNÇÃO
+
+        // ================= INIT & STORAGE =================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCheckoutData();
+            setupDraftSaving(); // Ativa a gravação de rascunhos de sessão
+            checkAuthState();
+            setupMasks();
+        });
+
+        function loadCheckoutData() {
+            try {
+                const data = localStorage.getItem("checkoutData");
+                if (!data) {
+                    window.location.href = 'carrinho.html';
+                    return;
+                }
+                checkoutData = JSON.parse(data);
+                renderSummary();
+                updateCartCounter();
+            } catch (error) {
+                console.error("Erro ao ler dados de checkout:", error);
+                window.location.href = 'carrinho.html';
+            }
+        }
+
+        // ================= RASCUNHO DE SESSÃO (Draft) =================
+        function setupDraftSaving() {
+            const saveToLocal = () => {
+                localStorage.setItem('guestReservationInfo', JSON.stringify({
+                    name: els.inputName.value.trim(),
+                    phone: els.inputPhone.value.trim(),
+                    email: els.inputEmail.value.trim()
+                }));
+            };
+
+            els.inputName.addEventListener('input', saveToLocal);
+            els.inputPhone.addEventListener('input', saveToLocal);
+            els.inputEmail.addEventListener('input', saveToLocal);
+
+            const draftPay = localStorage.getItem('draftPaymentMethod');
+            if (draftPay) {
+                selectPayment(draftPay);
+            }
+        }
+
+        // ================= FUNÇÃO LIMPAR CHECKOUT =================
+        function clearCheckout() {
+            if (confirm("Tem certeza que deseja limpar os dados do checkout e esvaziar o carrinho?")) {
+                localStorage.removeItem("checkoutData");
+                localStorage.removeItem("guestReservationInfo");
+                localStorage.removeItem("draftPaymentMethod");
+                
+                // Limpa o carrinho principal também
+                localStorage.removeItem("cart");
+
+                window.location.href = 'catalogo.html';
+            }
+        }
+
+        // ================= AUTHENTICATION & MERGE LOGIC =================
+        function checkAuthState() {
+            onAuthStateChanged(auth, async (user) => {
+                const draftInfo = JSON.parse(localStorage.getItem('guestReservationInfo') || '{}');
+
+                if (user) {
+                    currentUser = user;
+                    setAuthState('LOGGED_IN');
+                    
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists()) {
+                            const data = userDoc.data();
+                            els.inputName.value = data.name || draftInfo.name || user.displayName || "";
+                            if (els.inputName.value.trim() !== "") els.inputName.readOnly = true;
+                            
+                            els.inputPhone.value = data.phone || draftInfo.phone || ""; 
+                            els.inputEmail.value = data.email || draftInfo.email || user.email || "";
+                        } else {
+                            els.inputName.value = draftInfo.name || user.displayName || "";
+                            if (els.inputName.value.trim() !== "") els.inputName.readOnly = true;
+                            
+                            els.inputPhone.value = draftInfo.phone || ""; 
+                            els.inputEmail.value = draftInfo.email || user.email || "";
+                        }
+                    } catch (e) {
+                        console.error("Erro ao puxar dados", e);
+                    }
+                } else {
+                    currentUser = null;
+                    els.inputName.readOnly = false;
+                    
+                    if(draftInfo.name || draftInfo.phone || draftInfo.email) {
+                        els.inputName.value = draftInfo.name || "";
+                        els.inputPhone.value = draftInfo.phone || "";
+                        els.inputEmail.value = draftInfo.email || "";
+                        setAuthState('GUEST_FORM');
+                    } else {
+                        setAuthState('PROMPT');
+                    }
+                }
+            });
+        }
+
+        function setAuthState(state) {
+            els.guestPrompt.style.display = 'none';
+            els.guestForm.style.display = 'none';
+            els.badgeAuth.style.display = 'none';
+            isGuestFormVisible = false;
+
+            if (state === 'LOGGED_IN') {
+                els.guestForm.style.display = 'block'; 
+                els.badgeAuth.style.display = 'inline-block';
+                isGuestFormVisible = true;
+                document.getElementById('nav-login').textContent = 'Minha Conta ➔';
+                els.authToggleBtn.textContent = 'Sair / Trocar de conta';
+                els.authToggleBtn.onclick = logoutApp;
+            } else if (state === 'GUEST_FORM') {
+                els.guestForm.style.display = 'block';
+                isGuestFormVisible = true;
+                document.getElementById('nav-login').textContent = 'Entrar ➔';
+                els.authToggleBtn.textContent = 'Voltar / Fazer Login';
+                els.authToggleBtn.onclick = openAuthModal;
+            } else if (state === 'PROMPT') {
+                els.guestPrompt.style.display = 'block';
+                document.getElementById('nav-login').textContent = 'Entrar ➔';
+            }
+        }
+
+        async function logoutApp() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error("Erro ao sair da conta:", error);
+                showToast("Erro ao desconectar.");
+            }
+        }
+
+        // ================= MODAL LOGIC =================
+        function openAuthModal() { els.authModal.classList.add('show'); }
+        function closeAuthModal() { els.authModal.classList.remove('show'); }
+        function proceedAsGuest() {
+            closeAuthModal();
+            setAuthState('GUEST_FORM');
+        }
+
+        // ================= RENDER =================
+        function renderSummary() {
+            els.itemsContainer.innerHTML = '';
+            if (checkoutData.cart && checkoutData.cart.length > 0) {
+                checkoutData.cart.forEach(item => {
+                    const subtotalItem = item.price * item.quantity;
+                    const row = document.createElement('div');
+                    row.className = 'order-item';
+                    row.innerHTML = `
+                        <div class="item-info">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-qty">x${item.quantity} unidade(s)</span>
+                        </div>
+                        <span class="item-price">${formatCurrency(subtotalItem)}</span>
+                    `;
+                    els.itemsContainer.appendChild(row);
+                });
+            }
+
+            if (checkoutData.pickupDateTime) {
+                if (typeof checkoutData.pickupDateTime === 'object' && checkoutData.pickupDateTime.date) {
+                    const [year, month, day] = checkoutData.pickupDateTime.date.split('-');
+                    els.pickupDate.textContent = `${day}/${month}/${year} às ${checkoutData.pickupDateTime.time}`;
+                } else {
+                    els.pickupDate.textContent = checkoutData.pickupDateTime;
+                }
+            } else {
+                els.pickupDate.textContent = 'Não agendado';
+            }
+
+            const totalStr = formatCurrency(checkoutData.total);
+            els.summaryTotal.textContent = totalStr;
+            els.finalTotal.textContent = totalStr;
+        }
+
+        function updateCartCounter() {
+            if(checkoutData && checkoutData.cart) {
+                const totalItems = checkoutData.cart.reduce((acc, item) => acc + item.quantity, 0);
+                els.navCount.textContent = `Carrinho (${totalItems})`;
+            }
+        }
+
+        // ================= PAYMENT SELECTION =================
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            localStorage.setItem('draftPaymentMethod', method);
+
+            els.payCards.forEach(card => card.classList.remove('active'));
+            const selectedCard = document.querySelector(`.pay-card[data-method="${method}"]`);
+            if (selectedCard) selectedCard.classList.add('active');
+
+            const hints = {
+                "Dinheiro": "Leve o valor trocado se possível. O pagamento será feito na retirada.",
+                "Cartão de Crédito": "Você passará o cartão presencialmente na nossa maquininha.",
+                "Cartão de Débito": "Você passará o cartão presencialmente na nossa maquininha."
+            };
+            els.payHint.textContent = hints[method] || "";
+        }
+
+        // ================= VALIDATION & UTILS =================
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        function showToast(message) {
+            els.toastError.textContent = message;
+            els.toastError.classList.add('show');
+            setTimeout(() => els.toastError.classList.remove('show'), 4000);
+        }
+
+        function setupMasks() {
+            els.inputPhone.addEventListener('input', (e) => {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+                e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+            });
+        }
+
+        function validateCheckout() {
+            if (!currentUser && !isGuestFormVisible) {
+                showToast("Por favor, clique em 'Identificar-se' para preencher seus dados.");
+                openAuthModal();
+                return false;
+            }
+
+            const name = els.inputName.value.trim();
+            const phone = els.inputPhone.value.trim().replace(/\D/g, '');
+
+            if (name.length < 3) {
+                showToast("Por favor, insira um nome válido (mínimo 3 caracteres).");
+                els.inputName.focus();
+                return false;
+            }
+            if (phone.length < 10 || phone.length > 11) {
+                showToast("Insira um telefone válido com DDD.");
+                els.inputPhone.focus();
+                return false;
+            }
+            if (!selectedPaymentMethod) {
+                showToast("Selecione um método de pagamento.");
+                return false;
+            }
+            return true;
+        }
+
+        // ================= FIRESTORE SUBMIT (NOVO) =================
+        async function submitReservation() {
+            if (!validateCheckout()) return;
+
+            // Busca o botão para mostrar estado de carregamento
+            const btnSubmit = document.querySelector('.action-area .btn-filled');
+            if(btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.textContent = "Processando...";
+                btnSubmit.style.opacity = "0.7";
+            }
+
+            try {
+                // 1. VERIFICAÇÃO DE ESTOQUE NO FIREBASE
+                if (checkoutData && checkoutData.cart) {
+                    for (let item of checkoutData.cart) {
+                        const productRef = doc(db, "products", item.id);
+                        const productSnap = await getDoc(productRef);
+                        
+                        if (productSnap.exists()) {
+                            const productData = productSnap.data();
+                            if (item.quantity > productData.stock) {
+                                alert(`Não foi possível reservar. O item "${item.name}" possui apenas ${productData.stock} unidade(s) em estoque (Você pediu ${item.quantity}). Por favor, volte ao carrinho e ajuste a quantidade.`);
+                                
+                                if(btnSubmit) {
+                                    btnSubmit.disabled = false;
+                                    btnSubmit.textContent = "Realizar Reserva ➔";
+                                    btnSubmit.style.opacity = "1";
+                                }
+                                return; // Cancela a gravação da reserva
+                            }
+                        } else {
+                            alert(`O item "${item.name}" não foi encontrado no banco de dados.`);
+                            if(btnSubmit) {
+                                btnSubmit.disabled = false;
+                                btnSubmit.textContent = "Realizar Reserva ➔";
+                                btnSubmit.style.opacity = "1";
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                // 2. MONTA OS DADOS PARA SALVAR (Payload)
+                const reservationPayload = {
+                    userId: currentUser ? currentUser.uid : null,
+                    customer: {
+                        name: els.inputName.value.trim(),
+                        phone: els.inputPhone.value.trim(),
+                        email: els.inputEmail.value.trim()
+                    },
+                    products: checkoutData.cart,
+                    subtotal: checkoutData.subtotal || checkoutData.total,
+                    total: checkoutData.total,
+                    pickupDateTime: checkoutData.pickupDateTime,
+                    paymentMethod: selectedPaymentMethod,
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                };
+
+                // 3. SALVA A RESERVA NA COLLECTION "reservations"
+                const docRef = await addDoc(collection(db, "reservations"), reservationPayload);
+                
+                // 4. SALVA O ESTADO DA RESERVA PARA A PRÓXIMA TELA LER
+                const currentRes = {
+                    id: docRef.id,
+                    ...reservationPayload,
+                    createdAt: new Date().toISOString() 
+                };
+                localStorage.setItem("currentReservation", JSON.stringify(currentRes));
+                
+                // 5. LIMPEZA TOTAL (Limpa o checkout e o carrinho principal)
+                localStorage.removeItem("checkoutData");
+                localStorage.removeItem("guestReservationInfo");
+                localStorage.removeItem("draftPaymentMethod");
+                localStorage.removeItem("cart"); // Limpando o carrinho aqui também!
+
+                // 6. REDIRECIONA PARA A TELA DE SUCESSO
+                window.location.href = 'reserva-status.html'; 
+                
+            } catch (error) {
+                console.error("Erro ao salvar reserva:", error);
+                showToast("Erro ao processar sua reserva. Tente novamente.");
+                if(btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.textContent = "Realizar Reserva ➔";
+                    btnSubmit.style.opacity = "1";
+                }
+            }
+        }
+
+        // ================= FUNÇÃO VOLTAR AO CARRINHO (NOVA) =================
+        function returnToCart() {
+            // Pega o conteúdo de checkoutData.cart e devolve pro "cart"
+            if (checkoutData && checkoutData.cart) {
+                localStorage.setItem("cart", JSON.stringify(checkoutData.cart));
+            }
+            window.location.href = 'carrinho.html';
+        }
+
+    </script>
+</body>
+</html>

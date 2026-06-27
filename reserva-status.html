@@ -1,0 +1,800 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.E.U. - Minhas Reservas e Histórico</title>
+    <style>
+        /* ================= RESET E VARIÁVEIS ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --gradient-top: #CDE3FB;
+            --gradient-bottom: #FFF7EB;
+            --text-main: #1A1A1A;
+            --text-muted: #757575;
+            --bg-body: #FFFFFF;
+            --bg-card: #F9F9F6;
+            --bg-items: #FFFFFF;
+            --bg-footer: #345E3D;
+            --border-light: #EAEAEA;
+            --btn-dark: #2E5339;
+            --btn-outline: #FFFFFF;
+            --danger: #E53935;
+            
+            /* Cores de Estado Oficiais */
+            --status-pending: #FBC02D;
+            --status-approved: #42A5F5;
+            --status-completed: #2E5339;
+            --status-cancelled: #E53935;
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--gradient-top) 0%, var(--gradient-bottom) 100%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* ================= CABEÇALHO (HEADER) ================= */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: transparent;
+        }
+
+        .logo { font-size: 20px; font-weight: 800; }
+        nav { display: flex; gap: 25px; font-size: 13px; font-weight: 600; align-items: center; }
+        nav a { transition: opacity 0.2s; }
+        nav a:hover { opacity: 0.7; }
+
+        /* ================= CONTEÚDO PRINCIPAL ================= */
+        main {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 20px auto 80px;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2E5339;
+            margin-bottom: 8px;
+        }
+        .page-header p {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        /* Container que receberá a lista de reservas dinamicamente */
+        #reservations-container {
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        .reservation-card {
+            background-color: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        /* ================= BLOCO TOPO - STATUS ================= */
+        .status-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .badge-id {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #E0E0E0;
+            color: var(--text-main);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .status-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        /* ================= ESTADO VAZIO / LOADING ================= */
+        .empty-state, .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--bg-card);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+        .empty-state h2, .loading-state h2 { font-size: 24px; margin-bottom: 10px; color: var(--text-main); }
+        .empty-state p, .loading-state p { color: var(--text-muted); margin-bottom: 25px; }
+
+        /* ================= TIMELINE ================= */
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 60px;
+            right: 60px;
+            height: 2px;
+            background-color: var(--border-light);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .timeline-step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--bg-card);
+            padding: 0 20px;
+        }
+
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #FFF;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--border-light);
+            transition: all 0.3s;
+        }
+
+        .step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Classes reajustadas para pintar os caminhos */
+        .timeline-step.completed .step-icon {
+            background-color: var(--status-completed);
+            border-color: var(--status-completed);
+            color: #FFF;
+        }
+        .timeline-step.completed .step-label { color: var(--status-completed); }
+
+        .timeline-step.active .step-icon {
+            background-color: var(--status-approved);
+            border-color: var(--status-approved);
+            color: #FFF;
+            border-width: 2px;
+        }
+        .timeline-step.active .step-label { color: var(--status-approved); font-weight: 700; }
+
+        .timeline-cancelled {
+            text-align: center;
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 16px;
+            margin: 20px 0;
+            background: rgba(229, 57, 53, 0.08);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px dashed var(--danger);
+        }
+
+        /* ================= METADADOS ================= */
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background-color: #FFF;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-light);
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* ================= RESUMO DOS ITENS ================= */
+        .items-summary {
+            background-color: #FFF;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 30px;
+        }
+
+        .items-summary h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #F8F9FA;
+        }
+
+        .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-name { font-size: 14px; font-weight: 600; }
+        .product-qty { font-size: 12px; color: var(--text-muted); }
+        .product-price { font-size: 14px; font-weight: 700; text-align: right; }
+
+        .totals-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 10px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .total-row.final {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-light);
+        }
+
+        /* ================= AÇÕES ================= */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-filled { background-color: var(--btn-dark); color: #FFFFFF; }
+        .btn-filled:hover { opacity: 0.9; }
+        
+        .btn-outline { background-color: #FFFFFF; color: var(--text-main); border: 1px solid var(--border-light); }
+        .btn-outline:hover { background-color: #F4F3EF; }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        .btn-danger:hover { background-color: rgba(229, 57, 53, 0.1); }
+
+        /* ================= MODAL CANCELAMENTO ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-content {
+            background: #FFF;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-content h3 { margin-bottom: 10px; font-size: 20px; }
+        .modal-content p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+
+        /* ================= RODAPÉ ================= */
+        footer {
+            background-color: var(--bg-footer);
+            color: #FFFFFF;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 11px;
+            margin-top: auto;
+        }
+        .footer-left p { margin-bottom: 3px; }
+        .footer-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .social-icons { display: flex; gap: 15px; font-size: 16px; }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; gap: 15px; padding: 20px; }
+            .reservation-card { padding: 25px 15px; }
+            .metadata-grid { grid-template-columns: 1fr; gap: 15px; }
+            .action-buttons { flex-direction: column; }
+            .btn { width: 100%; }
+            footer { flex-direction: column; align-items: center; text-align: center; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="cancel-modal">
+        <div class="modal-content">
+            <h3>Cancelar Reserva</h3>
+            <p>Tem a certeza que deseja cancelar esta reserva? Esta ação não pode ser desfeita.</p>
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="confirm-cancel-btn">Confirmar cancelamento</button>
+                <button class="btn btn-outline" onclick="window.closeModal()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">M.E.U.</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="catalogo.html">Catálogo</a>
+            <a href="carrinho.html">Carrinho</a>
+            <a href="ajuda.html">Ajuda</a>
+            <a href="login.html" id="nav-login">Entrar ➔</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>Acompanhar Pedidos</h1>
+            <p>Veja suas reservas em andamento e o histórico de pedidos no M.E.U.</p>
+        </div>
+
+        <div id="reservations-container">
+            <div class="loading-state" id="loading-el">
+                <h2>Buscando informações...</h2>
+                <p>Sincronizando com o banco de dados do Mercadinho M.E.U.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <p>Copyright © 2026 meu.com.br LTDA.</p>
+            <p>CNPJ: 00.000.000/0000-00</p>
+        </div>
+        <div class="footer-right">
+            <p>© 2026 - Todos os direitos reservados</p>
+            <div class="social-icons">
+                <a href="#">📷</a>
+                <a href="#">in</a>
+                <a href="#">𝕏</a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, serverTimestamp, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+            authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+            projectId: "mercadinhomeu-1b712",
+            storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+            messagingSenderId: "677347106817",
+            appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ================= ESTADO DA APLICAÇÃO =================
+        let activeReservations = []; 
+        let reservationIdToCancel = null; 
+
+        const statusMap = {
+            'pending': { color: 'var(--status-pending)', title: 'Reserva recebida', desc: 'Estamos a separar os seus produtos.', icon: '🕒' },
+            'approved': { color: 'var(--status-approved)', title: 'Reserva aprovada', desc: 'A sua reserva está pronta para retirada no balcão!', icon: '📦' },
+            'completed': { color: 'var(--status-completed)', title: 'Reserva concluída', desc: 'Pedido retirado com sucesso. Obrigado!', icon: '✔' },
+            'cancelled': { color: 'var(--status-cancelled)', title: 'Reserva cancelada', desc: 'Esta reserva foi cancelada pelo cliente.', icon: '✖' }
+        };
+
+        const timelineSteps = [
+            { id: 'pending', label: 'Recebido' },
+            { id: 'approved', label: 'Aprovado' },
+            { id: 'completed', label: 'Concluído' }
+        ];
+
+        const container = document.getElementById('reservations-container');
+        const modal = document.getElementById('cancel-modal');
+
+        // ================= AUTENTICAÇÃO E ESCUTA REAL-TIME =================
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('nav-login').innerHTML = 'Sair';
+                document.getElementById('nav-login').href = 'login.html';
+                
+                const q = query(collection(db, "reservations"), where("userId", "==", user.uid));
+                
+                onSnapshot(q, (snapshot) => {
+                    let docsData = snapshot.docs.map(d => ({ dbId: d.id, ...d.data() }));
+                    
+                    docsData.sort((a, b) => {
+                        const timeA = a.createdAt?.seconds || 0;
+                        const timeB = b.createdAt?.seconds || 0;
+                        return timeB - timeA;
+                    });
+
+                    activeReservations = docsData;
+                    renderActiveReservations();
+                }, (error) => {
+                    console.error("Erro na escuta das reservas:", error);
+                    showEmptyState();
+                });
+
+            } else {
+                // Usuário Visitante (Guest) - Lê o localStorage
+                const localData = localStorage.getItem("currentReservation");
+                if (localData) {
+                    try {
+                        const parsedLocal = JSON.parse(localData);
+                        const guestDbId = parsedLocal.id || parsedLocal.dbId;
+                        
+                        if (guestDbId) {
+                            activeReservations = [parsedLocal];
+                            renderActiveReservations();
+
+                            try {
+                                onSnapshot(doc(db, "reservations", guestDbId), (docSnap) => {
+                                    if (docSnap.exists()) {
+                                        const data = { dbId: docSnap.id, id: docSnap.id, ...docSnap.data() };
+                                        activeReservations = [data]; 
+                                        renderActiveReservations();
+                                        localStorage.setItem("currentReservation", JSON.stringify(data));
+                                    }
+                                }, (error) => {
+                                    console.warn("Visitante visualizando em modo estático/local.", error);
+                                });
+                            } catch(e) {
+                                console.log("Fallback estático ativo.");
+                            }
+                        } else {
+                            showEmptyState();
+                        }
+                    } catch (e) {
+                        showEmptyState();
+                    }
+                } else {
+                    showEmptyState();
+                }
+            }
+        });
+
+        // ================= RENDERS E COMPILADORES DINÂMICOS =================
+        function showEmptyState() {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h2>Nenhum pedido encontrado</h2>
+                    <p>Você ainda não possui pedidos registrados no sistema.</p>
+                    <button class="btn btn-filled" onclick="window.location.href='catalogo.html'" style="max-width: 250px; margin: 0 auto;">Ver o Catálogo</button>
+                </div>
+            `;
+        }
+
+        function renderActiveReservations() {
+            if (activeReservations.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            container.innerHTML = ''; 
+
+            activeReservations.forEach((res) => {
+                const resId = res.dbId || res.id;
+                const statusInfo = statusMap[res.status] || statusMap['pending'];
+                const displayId = String(resId).slice(0, 6).toUpperCase();
+                
+                const dataCriacao = formatDate(res.createdAt);
+                
+                let horarioRetirada = 'Imediata';
+                if (res.pickupDateTime && res.pickupDateTime !== "Não agendado") {
+                    horarioRetirada = formatDate(res.pickupDateTime);
+                }
+
+                const metodoPagamento = res.paymentMethod || 'Não definido';
+                const custName = res.customer?.name || res.guestInfo?.name || 'Cliente';
+                const custPhone = res.customer?.phone || res.guestInfo?.phone || '';
+                
+                const items = res.products || res.cart || [];
+                let productRowsHtml = '';
+                
+                items.forEach(item => {
+                    const subtotalItem = item.price * item.quantity;
+                    const imgSrc = item.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=80&q=80';
+                    productRowsHtml += `
+                        <div class="product-item">
+                            <img src="${imgSrc}" alt="${item.name}" class="product-img">
+                            <div class="product-info">
+                                <span class="product-name">${item.name}</span>
+                                <span class="product-qty">${item.quantity} un.</span>
+                            </div>
+                            <span class="product-price">${formatCurrency(subtotalItem)}</span>
+                        </div>
+                    `;
+                });
+
+                let timelineHtml = '';
+                
+                if (res.status === 'cancelled') {
+                    timelineHtml = `<div class="timeline-cancelled">Pedido Cancelado</div>`;
+                } else {
+                    let stepsHtml = '';
+                    let currentIndex = timelineSteps.findIndex(s => s.id === res.status);
+                    if (currentIndex === -1) currentIndex = 0;
+
+                    timelineSteps.forEach((step, index) => {
+                        let cssClass = 'timeline-step';
+                        let iconContent = '○';
+                        
+                        if (index < currentIndex) {
+                            cssClass += ' completed';
+                            iconContent = '✔';
+                        } else if (index === currentIndex) {
+                            cssClass += ' active';
+                            iconContent = '●';
+                        }
+                        
+                        stepsHtml += `
+                            <div class="${cssClass}">
+                                <div class="step-icon">${iconContent}</div>
+                                <span class="step-label">${step.label}</span>
+                            </div>
+                        `;
+                    });
+
+                    timelineHtml = `<div class="timeline-container">${stepsHtml}</div>`;
+                }
+
+                // Só exibe opção de cancelamento se a reserva ainda estiver pendente
+                const cancelBtnHtml = res.status === 'pending' 
+                    ? `<button class="btn btn-danger" onclick="window.openModal('${resId}')">Cancelar reserva</button>` 
+                    : '';
+
+                const discountRowHtml = res.discount > 0 
+                    ? `<div class="total-row"><span>Desconto</span><span>- ${formatCurrency(res.discount)}</span></div>` 
+                    : '';
+
+                const card = document.createElement('div');
+                card.className = 'reservation-card';
+                card.innerHTML = `
+                    <div class="badge-id">#${displayId}</div>
+
+                    <div class="status-header">
+                        <div class="status-icon" style="background-color: ${statusInfo.color}">${statusInfo.icon}</div>
+                        <h1 class="status-title" style="color: ${statusInfo.color}">${statusInfo.title}</h1>
+                        <p class="status-desc">${statusInfo.desc}</p>
+                    </div>
+
+                    ${timelineHtml}
+
+                    <div class="metadata-grid">
+                        <div class="meta-item">
+                            <span class="meta-label">Data da reserva</span>
+                            <span class="meta-value">${dataCriacao}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Horário de retirada</span>
+                            <span class="meta-value">${horarioRetirada}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Método de pagamento</span>
+                            <span class="meta-value">${metodoPagamento}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Cliente / Telefone</span>
+                            <span class="meta-value">${custName} ${custPhone ? '(' + custPhone + ')' : ''}</span>
+                        </div>
+                    </div>
+
+                    <div class="items-summary">
+                        <h3>Resumo do Pedido</h3>
+                        <div class="product-list">${productRowsHtml}</div>
+                        <div class="totals-area">
+                            <div class="total-row">
+                                <span>Subtotal</span>
+                                <span>${formatCurrency(res.subtotal || 0)}</span>
+                            </div>
+                            ${discountRowHtml}
+                            <div class="total-row final">
+                                <span>Total a pagar</span>
+                                <span>${formatCurrency(res.total || 0)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="window.location.href='index.html'">Voltar ao início</button>
+                        ${cancelBtnHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ================= INTERAÇÕES DO MODAL E OPERAÇÃO DE EXCLUSÃO =================
+        window.openModal = function(dbId) { 
+            reservationIdToCancel = dbId;
+            modal.classList.add('show'); 
+        }
+        
+        window.closeModal = function() { 
+            reservationIdToCancel = null;
+            modal.classList.remove('show'); 
+        }
+        
+        document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+            if (!reservationIdToCancel) return;
+            try {
+                const docRef = doc(db, "reservations", reservationIdToCancel);
+                await updateDoc(docRef, {
+                    status: 'cancelled',
+                    updatedAt: serverTimestamp()
+                });
+                
+                // Força atualização local para experiência instantânea do visitante (Guest)
+                const localData = localStorage.getItem("currentReservation");
+                if (localData) {
+                    const parsedLocal = JSON.parse(localData);
+                    if (parsedLocal.id === reservationIdToCancel || parsedLocal.dbId === reservationIdToCancel) {
+                        parsedLocal.status = 'cancelled';
+                        localStorage.setItem("currentReservation", JSON.stringify(parsedLocal));
+                        activeReservations = [parsedLocal];
+                        renderActiveReservations();
+                    }
+                }
+                
+                window.closeModal();
+            } catch (error) {
+                console.error("Erro ao cancelar reserva no Firebase:", error);
+                alert("Não foi possível processar o cancelamento no servidor.");
+            }
+        });
+
+        // ================= METRICAS E CONVERSÕES =================
+        function formatCurrency(val) {
+            return Number(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return '-';
+            try {
+                let dateObj;
+                if (dateValue.seconds) { 
+                    dateObj = new Date(dateValue.seconds * 1000);
+                } else { 
+                    dateObj = new Date(dateValue);
+                }
+                
+                const date = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const time = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                
+                if (date === 'Invalid Date') return String(dateValue);
+                return `${date} às ${time}`;
+            } catch (e) {
+                return String(dateValue);
+            }
+        }
+    </script>
+</body>
+</html>

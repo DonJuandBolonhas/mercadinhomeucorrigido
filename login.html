@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.E.U. | Login</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
+:root {
+  --top:#CDE3FB; --bottom:#FFF7EB; --text:#1A1A1A; --muted:#757575;
+  --border:#D1D5DB; --login:#386A46; --register:#4A3323; --notice:#F5F1EB;
+}
+body { min-height:100vh; display:flex; flex-direction:column; background:#fff; color:var(--text); }
+
+/* HEADER */
+.login-header { background: linear-gradient(to bottom, var(--top), var(--bottom)); padding:70px 20px; text-align:center; }
+.login-header h1 { font-size:58px; font-weight:900; letter-spacing:2px; }
+.login-header span { display:block; font-size:52px; margin-top:8px; }
+
+/* MAIN */
+.login-main { flex:1; max-width:580px; margin:auto; padding:50px 20px; text-align:center; }
+.instruction-text { color:var(--muted); font-size:15px; margin-bottom:30px; line-height:1.6; }
+.form-group { position:relative; max-width:380px; margin:0 auto 18px; }
+.form-control { width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:12px; font-size:14px; outline:none; transition:.25s; }
+.form-control:focus { border-color:#7BAAE8; box-shadow:0 0 0 3px rgba(123,170,232,.15); }
+
+/* Olho da Senha */
+.password-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none; opacity: 0.7; transition: 0.2s; }
+.password-toggle:hover { opacity: 1; }
+#password { padding-right: 40px; }
+
+/* Container para alinhar os botões */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ================== BOTÃO LOGIN (VERDE) ================== */
+.btn-login {
+    flex: 1;
+    background-color: #386A46;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-login:hover {
+    background-color: #274d32;
+}
+
+.btn-login:active {
+    transform: scale(0.96);
+}
+
+/* =============== BOTÃO CRIAR CONTA (MARROM) =============== */
+.btn-criar-conta {
+    flex: 1;
+    background-color: #4A3323;
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-criar-conta:hover {
+    opacity: 0.85;
+}
+
+.btn-criar-conta:active {
+    transform: scale(0.96);
+}
+
+/* FEEDBACK MESSAGES */
+#authMessage { display:none; margin:20px auto; padding:14px; border-radius:12px; font-size:13px; font-weight:600; max-width:380px; text-align:center; }
+#authMessage.success { background:#E8F7ED; color:#216E39; border: 1px solid #C3E6CB; }
+#authMessage.error { background:#FDECEC; color:#B42318; border: 1px solid #F5C6CB; }
+
+/* LOADING SPINNER */
+.btn-login.loading { pointer-events:none; opacity:.75; }
+.btn-login.loading::after { content:""; display:inline-block; width:14px; height:14px; margin-left:10px; border:2px solid rgba(255,255,255,.4); border-top:2px solid white; border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* TEXT & NOTICE */
+.terms-text { font-size:13px; margin-bottom:15px; margin-top:30px; line-height:1.5; }
+.help-link { display:block; max-width:380px; margin:0 auto 35px; text-align:center; font-size:14px; text-decoration:underline; }
+.notice-box { background:var(--notice); padding:22px; border-radius:18px; max-width:500px; margin:auto; display:flex; gap:14px; text-align:left; font-size:13px; line-height:1.7; }
+.notice-icon { font-size:18px; }
+
+/* FOOTER */
+footer { border-top:1px solid #ECECEC; padding:28px 40px; display:flex; justify-content:space-between; align-items:center; }
+.footer-right { display:flex; gap:16px; font-size:20px; }
+.footer-right a { transition:.25s; text-decoration:none; color:inherit; }
+.footer-right a:hover { opacity:.65; }
+
+/* RESPONSIVO */
+@media(max-width:650px) {
+  .login-header h1 { font-size:42px; }
+  .login-header span { font-size:38px; }
+  .form-actions { flex-direction:column; }
+  .btn-login, .btn-criar-conta { width:100%; }
+  footer { flex-direction:column; gap:18px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<header class="login-header">
+  <h1>MERCADINHO<span>M.E.U.</span></h1>
+</header>
+
+<main class="login-main">
+  <p class="instruction-text">Digite seu e-mail e senha para iniciar sessão.</p>
+
+  <form id="loginForm">
+    <div class="form-group">
+        <input type="email" id="email" class="form-control" placeholder="E-mail" required>
+    </div>
+    
+    <div class="form-group">
+        <input type="password" id="password" class="form-control" placeholder="Senha" required>
+        <span class="password-toggle" id="togglePassword">👁️</span>
+    </div>
+
+    <div id="authMessage"></div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn-login" id="loginBtn">Login</button>
+        <a href="cadastro.html" class="btn-criar-conta">Criar Conta</a>
+    </div>
+  </form>
+
+  <p class="terms-text">Ao continuar, você concorda com as condições de uso e privacidade do M.E.U.</p>
+  <a href="ajuda.html" class="help-link">Precisa de ajuda?</a>
+
+  <div class="notice-box">
+    <div class="notice-icon">ⓘ</div>
+    <div>
+      Funcionários e gerentes utilizam e-mail institucional.<br>
+      Clientes utilizam e-mail pessoal (ex: @clientemeu.com).
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div>Copyright © 2026 meu.com.br LTDA.</div>
+  <div class="footer-right">
+    <a href="#">📷</a>
+    <a href="#">in</a>
+    <a href="#">𝕏</a>
+  </div>
+</footer>
+
+<script type="module">
+  // 1. Importando SDKs do Firebase v10
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc 
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  // 2. Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+    authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+    projectId: "mercadinhomeu-1b712",
+    storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+    messagingSenderId: "677347106817",
+    appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // 3. Elementos do DOM
+  const form = document.getElementById('loginForm');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const togglePassword = document.getElementById('togglePassword');
+  const loginBtn = document.getElementById('loginBtn');
+  const authMessage = document.getElementById('authMessage');
+
+  // Lógica do Olho de Senha (Mostrar/Ocultar)
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+  });
+
+  // Funções de Feedback Visual - CORRIGIDAS AQUI
+  function showError(msg) {
+    authMessage.className = 'error';
+    authMessage.style.display = 'block'; // Força a exibição ignorando o CSS base
+    authMessage.textContent = msg;
+  }
+
+  function showSuccess(msg) {
+    authMessage.className = 'success';
+    authMessage.style.display = 'block'; // Força a exibição ignorando o CSS base
+    authMessage.textContent = msg;
+  }
+
+  function clearMessage() {
+    authMessage.className = '';
+    authMessage.style.display = 'none'; // Esconde a div para o novo teste
+  }
+
+  // Função para redirecionar conforme a Role
+  function redirectByRole(role) {
+    setTimeout(() => {
+      if (role === 'gerente' || role === 'admin') {
+        window.location.href = "gerente.html";
+      } else if (role === 'funcionario') {
+        window.location.href = "funcionario.html";
+      } else {
+        window.location.href = "index.html"; // Cliente vai para a Home
+      }
+    }, 1500);
+  }
+
+  // 4. Lógica de LOGIN
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearMessage();
+    
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      showError("Por favor, preencha e-mail e senha.");
+      return;
+    }
+
+    loginBtn.classList.add('loading');
+
+    try {
+      // Tenta logar o usuário
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Buscar dados do usuário no Firestore para redirecionar conforme a Role
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      let role = 'cliente'; // Caso não encontre no DB, assume cliente por segurança
+
+      if (userDoc.exists()) {
+        role = userDoc.data().role || 'cliente';
+      }
+      
+      showSuccess(`Login realizado com sucesso! Redirecionando...`);
+      
+      // Executa o redirecionamento baseado na role
+      redirectByRole(role);
+
+    } catch (error) {
+      console.error("Erro no Login:", error);
+      
+      // Tratamento de erros específicos do Firebase em PT-BR
+      switch (error.code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            showError("E-mail ou senha incorretos.");
+            break;
+        case 'auth/invalid-email':
+            showError("O formato do e-mail é inválido.");
+            break;
+        case 'auth/user-disabled':
+            showError("Esta conta foi desativada pelo administrador.");
+            break;
+        case 'auth/too-many-requests':
+            showError("Muitas tentativas falhas. Conta bloqueada temporariamente.");
+            break;
+        case 'auth/network-request-failed':
+            showError("Erro de conexão. Verifique sua internet.");
+            break;
+        default:
+            showError("Erro ao fazer login. Tente novamente mais tarde.");
+      }
+    } finally {
+      loginBtn.classList.remove('loading');
+    }
+  });
+</script>
+
+</body>
+</html>

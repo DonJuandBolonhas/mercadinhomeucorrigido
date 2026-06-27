@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.E.U. | Criar Conta</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
+:root {
+  --gradient-top:#CDE3FB; --gradient-bottom:#FFF7EB; --text-main:#1A1A1A;
+  --text-muted:#757575; --border-color:#E2E8F0; --btn-register:#345E3D;
+  --success:#1E8E3E; --error:#C62828;
+}
+body { background:#fff; min-height:100vh; display:flex; flex-direction:column; color:var(--text-main); }
+
+/* HEADER */
+.register-header { background: linear-gradient(to bottom, var(--gradient-top), var(--gradient-bottom)); padding:70px 20px; text-align:center; }
+.register-header h1 { font-size:56px; font-weight:900; line-height:1.1; letter-spacing:2px; }
+.register-header h1 span { display:block; font-size:50px; margin-top:8px; }
+
+/* MAIN */
+.register-main { flex:1; max-width:560px; width:100%; margin:auto; padding:40px 20px; text-align:center; }
+.page-title { font-size:26px; font-weight:700; margin-bottom:18px; color:#444; }
+.instruction-text { font-size:14px; color:var(--text-muted); line-height:1.6; max-width:300px; margin:0 auto 35px; }
+
+/* FORM */
+.register-form { max-width:390px; margin:auto; }
+.form-group { position:relative; margin-bottom:18px; }
+.form-control { width:100%; padding:14px 16px; border:1px solid var(--border-color); border-radius:12px; font-size:14px; outline:none; transition:.25s; }
+.form-control:focus { border-color:#8BB5ED; box-shadow:0 0 0 4px rgba(139,181,237,.15); }
+.form-control.valid { border-color:var(--success); }
+.form-control.invalid { border-color:var(--error); }
+
+/* PASSWORD TOGGLE */
+.password-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:15px; }
+
+/* PASSWORD RULES */
+.password-rules { background:#FAFAFA; border:1px solid #ECECEC; border-radius:14px; padding:16px; margin:10px 0 25px; text-align:left; font-size:13px; }
+.password-rules p { margin-bottom:10px; font-weight:700; }
+.rule { margin-bottom:8px; color:#777; transition:.2s; }
+.rule.valid { color:var(--success); font-weight:600; }
+
+/* BUTTON */
+.btn-submit { width:100%; padding:14px; border:none; border-radius:28px; background:var(--btn-register); color:white; font-size:15px; font-weight:700; cursor:pointer; transition:.25s; }
+.btn-submit:hover { opacity:.92; transform:translateY(-2px); }
+.btn-submit.loading { pointer-events:none; opacity:.75; }
+.btn-submit.loading::after { content:""; display:inline-block; width:14px; height:14px; margin-left:10px; border:2px solid rgba(255,255,255,.4); border-top:2px solid white; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* MESSAGE */
+#authMessage { display:none; margin-top:18px; padding:14px; border-radius:12px; font-size:13px; font-weight:600; }
+#authMessage.success { display:block; background:#EAF7ED; color:var(--success); border: 1px solid #C3E6CB; }
+#authMessage.error { display:block; background:#FDECEC; color:var(--error); border: 1px solid #F5C6CB; }
+
+/* TERMS */
+.terms-text { font-size:13px; line-height:1.5; max-width:470px; margin:35px auto 15px; }
+.help-link { display:block; text-align:left; max-width:390px; margin:0 auto; font-size:14px; text-decoration:underline; }
+
+/* FOOTER */
+footer { border-top:1px solid #ECECEC; padding:28px 40px; display:flex; justify-content:space-between; align-items:center; margin-top:50px; }
+.footer-left { font-size:13px; color:var(--text-muted); }
+.footer-right { display:flex; gap:16px; font-size:20px; }
+.footer-right a { transition:.25s; text-decoration:none; color:inherit; }
+.footer-right a:hover { opacity:.65; }
+
+/* RESPONSIVO */
+@media(max-width:650px) {
+  .register-header h1 { font-size:40px; }
+  .register-header h1 span { font-size:36px; }
+  footer { flex-direction:column; gap:18px; text-align:center; padding:20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="register-header">
+  <h1>MERCADINHO<span>M.E.U.</span></h1>
+</header>
+
+<main class="register-main">
+  <h2 class="page-title">Criando conta</h2>
+  <p class="instruction-text">Digite seus dados para criar sua conta no M.E.U.</p>
+
+  <form id="registerForm" class="register-form" novalidate>
+    <div class="form-group">
+      <input type="text" id="name" class="form-control" placeholder="Digite seu nome" required>
+    </div>
+    <div class="form-group">
+      <input type="email" id="email" class="form-control" placeholder="Digite seu e-mail" autocomplete="email" required>
+    </div>
+    <div class="form-group">
+      <input type="password" id="password" class="form-control" placeholder="Digite sua senha" autocomplete="new-password" required>
+      <span class="password-toggle">👁</span>
+    </div>
+
+    <div class="password-rules">
+      <p>Senha deve conter:</p>
+      <div class="rule" id="lengthRule">✖ Mínimo 8 caracteres</div>
+      <div class="rule" id="upperRule">✖ 1 letra maiúscula</div>
+      <div class="rule" id="lowerRule">✖ 1 letra minúscula</div>
+      <div class="rule" id="numberRule">✖ 1 número</div>
+      <div class="rule" id="specialRule">✖ 1 caractere especial</div>
+    </div>
+
+    <button type="submit" id="registerBtn" class="btn-submit">Criar conta</button>
+    <div id="authMessage"></div>
+  </form>
+
+  <p class="terms-text">Ao criar a conta, você concorda com as Condições de Uso e a Notificação de Privacidade do M.E.U.</p>
+  <a href="ajuda.html" class="help-link">Precisa de ajuda?</a>
+</main>
+
+<footer>
+  <div class="footer-left">Copyright © 2026 meu.com.br LTDA.</div>
+  <div class="footer-right">
+    <a href="#">📷</a>
+    <a href="#">in</a>
+    <a href="#">𝕏</a>
+  </div>
+</footer>
+
+<script type="module">
+  // 1. Importando SDKs do Firebase v10
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword 
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    serverTimestamp 
+  } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+  // 2. Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+    authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+    projectId: "mercadinhomeu-1b712",
+    storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+    messagingSenderId: "677347106817",
+    appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  /* ELEMENTOS DO DOM */
+  const form = document.getElementById('registerForm');
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const registerBtn = document.getElementById('registerBtn');
+  const authMessage = document.getElementById('authMessage');
+  const toggle = document.querySelector('.password-toggle');
+
+  /* PASSWORD TOGGLE */
+  toggle.addEventListener('click', () => {
+    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+  });
+
+  /* EMAIL VALIDATION UI */
+  emailInput.addEventListener('input', () => {
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+    emailInput.classList.toggle('valid', valid);
+    emailInput.classList.toggle('invalid', emailInput.value && !valid);
+  });
+
+  /* PASSWORD RULES UI */
+  const rules = {
+    lengthRule: value => value.length >= 8,
+    upperRule: value => /[A-Z]/.test(value),
+    lowerRule: value => /[a-z]/.test(value),
+    numberRule: value => /[0-9]/.test(value),
+    specialRule: value => /[^A-Za-z0-9]/.test(value)
+  };
+
+  passwordInput.addEventListener('input', () => {
+    const value = passwordInput.value;
+    Object.entries(rules).forEach(([id, validator]) => {
+      const element = document.getElementById(id);
+      const valid = validator(value);
+      element.classList.toggle('valid', valid);
+      element.innerHTML = (valid ? '✔ ' : '✖ ') + element.textContent.slice(2);
+    });
+  });
+
+  /* FUNÇÕES DE MENSAGEM */
+  function showError(msg) {
+    authMessage.className = 'error';
+    authMessage.style.display = 'block';
+    authMessage.textContent = msg;
+  }
+
+  function showSuccess(msg) {
+    authMessage.className = 'success';
+    authMessage.style.display = 'block';
+    authMessage.textContent = msg;
+  }
+
+  function clearMessage() {
+    authMessage.style.display = 'none';
+    authMessage.className = '';
+  }
+
+  /* DETERMINAR ROLE PELO EMAIL */
+  function getRoleFromEmail(email) {
+    if (email.endsWith('@admmeu.com')) return 'gerente';
+    if (email.endsWith('@coopmeu.com')) return 'funcionario';
+    return 'client';
+  }
+
+  function redirectByRole(role) {
+    setTimeout(() => {
+      if (role === 'gerente') {
+        window.location.href = "gerente.html";
+      } else if (role === 'funcionario') {
+        window.location.href = "funcionario.html";
+      } else {
+        window.location.href = "index.html"; // Cliente vai para a Home
+      }
+    }, 1500);
+  }
+
+  /* SUBMISSÃO DO FORMULÁRIO (INTEGRAÇÃO FIREBASE) */
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearMessage();
+
+    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value);
+    const passwordValid = Object.values(rules).every(fn => fn(passwordInput.value));
+
+    if (nameInput.value.trim().length < 3) {
+      showError('Digite um nome válido.');
+      return;
+    }
+    if (!emailValid) {
+      showError('Digite um e-mail válido.');
+      return;
+    }
+    if (!passwordValid) {
+      showError('A senha não atende aos requisitos.');
+      return;
+    }
+
+    registerBtn.classList.add('loading');
+
+    try {
+      // 1. Cria usuário na Autenticação
+      const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+      const user = userCredential.user;
+      
+      // 2. Define a permissão
+      const role = getRoleFromEmail(emailInput.value);
+
+      // 3. Salva os dados no banco de dados (Firestore)
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name: nameInput.value.trim(),
+        email: user.email,
+        role: role,
+        createdAt: serverTimestamp(),
+        active: true
+      });
+
+      showSuccess('Conta criada com sucesso! Redirecionando...');
+      
+      // 4. Redirecionamento Inteligente Pós-Cadastro
+      setTimeout(() => {
+        const checkoutData = localStorage.getItem('checkoutData');
+        if (checkoutData) {
+          try {
+            const parsedData = JSON.parse(checkoutData);
+            // Se houver um carrinho ativo guardado para checkout, leva de volta para lá
+            if (parsedData && parsedData.cart && parsedData.cart.length > 0) {
+              window.location.href = "checkout.html";
+              return;
+            }
+          } catch (err) {
+            console.error("Erro ao validar checkoutData no localStorage:", err);
+          }
+        }
+        
+        // Se não houver dados de checkout pendentes, vai para a página inicial padrão
+        redirectByRole(role);
+      }, 1500);
+
+    } catch (error) {
+      console.error("Erro no Registro:", error);
+      if (error.code === 'auth/email-already-in-use') {
+        showError('Este e-mail já está cadastrado.');
+      } else {
+        showError('Ocorreu um erro ao criar a conta. Tente novamente.');
+      }
+    } finally {
+      registerBtn.classList.remove('loading');
+    }
+  });
+</script>
+
+</body>
+</html>

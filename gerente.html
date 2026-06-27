@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Gerente - M.E.U.</title>
+    <style>
+        /* =========================================
+           RESET E VARIÁVEIS GERAIS
+           ========================================= */
+        :root {
+            --header-bg: #402b24; /* Marrom escuro */
+            --header-text: #e8e3df;
+            --bg-color: #ffffff;
+            --primary-dark: #263e2c; /* Verde escuro institucional */
+            --card-bg: #f4f3ee; /* Bege/Cinza claro */
+            --text-main: #1a1a1a;
+            --text-muted: #555555;
+            --badge-bg: #d0e7d2;
+            --badge-text: #2f5a36;
+            --border-radius: 16px;
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: 50px;
+            display: none; /* Escondido por padrão até validar o login de admin */
+        }
+
+        /* =========================================
+           HEADER (NAVBAR)
+           ========================================= */
+        header {
+            background-color: var(--header-bg);
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--header-text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+        }
+
+        /* =========================================
+           CONTAINER PRINCIPAL
+           ========================================= */
+        .container {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* =========================================
+           CARDS DE MÉTRICAS (GRID)
+           ========================================= */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        .card-icon {
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .card-value-small {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           LISTAS (ACESSO RÁPIDO & ATIVIDADES)
+           ========================================= */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .section-link {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .list-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            filter: brightness(0.97);
+        }
+
+        .list-item-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-box {
+            background-color: #e6e4dc;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary-dark);
+        }
+
+        .icon-box svg { width: 20px; height: 20px; }
+        .list-item-title { font-weight: 600; font-size: 0.95rem; }
+        .list-arrow { color: var(--text-muted); }
+
+        /* Atividades Recentes */
+        .activity-item {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #e67e22; /* Laranja para pendente/atualizado */
+        }
+
+        .activity-dot.completed { background-color: #2ecc71; } /* Verde para finalizado */
+        .activity-dot.cancelled { background-color: #e74c3c; } /* Vermelho para cancelado */
+
+        .activity-content { flex: 1; }
+        .activity-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
+        .activity-time { font-size: 0.75rem; color: var(--text-muted); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">M.E.U.</a>
+        <nav>
+            <a href="funcionario.html?action=abrir">Cadastrar produto</a>
+            <a onclick="emitirRelatorio()">Emitir relatórios</a>
+            <a href="funcionario.html">Ver Reservas</a>
+            <a onclick="efetuarLogout()">Sair 🚪</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Painel do Gerente</h1>
+
+        <div class="metrics-grid">
+            <div class="card card-full">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                </div>
+                <div class="badge">Hoje</div>
+                <div class="card-label">Total de Vendas Concluídas</div>
+                <div class="card-value" id="val-vendas">R$ 0,00</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div class="card-label">Pedidos</div>
+                <div class="card-value-small"><span id="val-pedidos">0</span> Pendentes</div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <div class="card-label">Estoque</div>
+                <div class="card-value-small"><span id="val-estoque">0</span> Alertas</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2 class="section-title">Acesso Rápido</h2>
+        </div>
+        <div class="list-container">
+            <a href="gerenciar.html" class="list-item">
+                <div class="list-item-left">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span class="list-item-title">Gerenciar Catálogo e Estoque</span>
+                </div>
+                <span class="list-arrow">&gt;</span>
+            </a>
+            <a href="funcionario.html" class="list-item">
+                <div class="list-item-left">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span class="list-item-title">Ver Reservas e Pedidos</span>
+                </div>
+                <span class="list-arrow">&gt;</span>
+            </a>
+        </div>
+
+        <div class="section-header">
+            <h2 class="section-title">Atividades Recentes</h2>
+            <a href="funcionario.html" class="section-link">VER TUDO</a>
+        </div>
+        <div class="list-container" id="atividades-lista">
+            <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                    <div class="activity-title">Buscando atualizações em tempo real...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        // 1. CONFIGURAÇÃO DO FIREBASE (SDK V10)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Insira aqui as credenciais do seu projeto Firebase
+        const firebaseConfig = {
+    apiKey: "AIzaSyAw8dde4R2USA1GlNe7PvVRknE-VhhwusU",
+    authDomain: "mercadinhomeu-1b712.firebaseapp.com",
+    projectId: "mercadinhomeu-1b712",
+    storageBucket: "mercadinhomeu-1b712.firebasestorage.app",
+    messagingSenderId: "677347106817",
+    appId: "1:677347106817:web:5d29d58e4dbe6d4848e000"
+  };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // VARIÁVEIS PARA O EMISSOR DE RELATÓRIO
+        let relatorioData = { totalVendas: 0, pendentes: 0, alertas: 0, itensAlerta: [] };
+
+        // =========================================
+        // VALIDAÇÃO DE SEGURANÇA E PAPEL (@admmeu.com)
+        // =========================================
+        function verificarAcessoAdmin(userEmail) {
+            if (userEmail && userEmail.toLowerCase().endsWith("@admmeu.com")) {
+                document.body.style.display = "block"; // Libera a visualização da página
+                loadDashboardData();
+            } else {
+                alert("Acesso negado! Esta página é exclusiva para administradores (@admmeu.com).");
+                window.location.href = "login.html"; // Redireciona para a página de login
+            }
+        }
+
+        // Verifica o estado da sessão do Firebase
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                verificarAcessoAdmin(user.email);
+            } else {
+                // Alternativa caso esteja usando o Mock do localStorage em vez do Firebase Auth completo
+                const backupUser = JSON.parse(localStorage.getItem("loggedUser"));
+                if (backupUser && backupUser.email) {
+                    verificarAcessoAdmin(backupUser.email);
+                } else {
+                    window.location.href = "login.html";
+                }
+            }
+        });
+
+        window.efetuarLogout = async function() {
+            await signOut(auth);
+            localStorage.removeItem("loggedUser");
+            window.location.href = "login.html";
+        };
+
+
+        // =========================================
+        // CARREGAMENTO DE DADOS E MÉTRICAS
+        // =========================================
+        async function loadDashboardData() {
+            try {
+                const hojeInicio = new Date();
+                hojeInicio.setHours(0, 0, 0, 0);
+                
+                const resRef = collection(db, "reservations");
+
+                // A. TOTAL DE VALORES DE RESERVAS FINALIZADAS (completed)
+                const vendasQuery = query(resRef, where("status", "==", "completed"));
+                const vendasSnap = await getDocs(vendasQuery);
+                
+                let totalConcluido = 0;
+                vendasSnap.forEach(doc => {
+                    const data = doc.data();
+                    // Valida se foi finalizada hoje
+                    const dataAtualizacao = data.updatedAt ? data.updatedAt.toDate() : new Date();
+                    if (dataAtualizacao >= hojeInicio) {
+                        totalConcluido += data.total || 0;
+                    }
+                });
+
+                document.getElementById('val-vendas').innerText = totalConcluido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                relatorioData.totalVendas = totalConcluido;
+
+                // B. QUANTIDADE DE RESERVAS PENDENTES (pending)
+                const pendentesQuery = query(resRef, where("status", "==", "pending"));
+                const pendentesSnap = await getDocs(pendentesQuery);
+                const totalPendentes = pendentesSnap.size;
+                
+                document.getElementById('val-pedidos').innerText = totalPendentes;
+                relatorioData.pendentes = totalPendentes;
+
+                // C. PRODUTOS CADASTRADOS EM FALTA OU MARCADOS COMO INDISPONÍVEIS
+                const prodRef = collection(db, "products");
+                const prodSnap = await getDocs(prodRef);
+                let alertasEstoque = 0;
+                relatorioData.itensAlerta = [];
+                
+                prodSnap.forEach(doc => {
+                    const produto = doc.data();
+                    if (produto.stock <= 0 || produto.available === false) {
+                        alertasEstoque++;
+                        relatorioData.itensAlerta.push(`${produto.name} (Estoque: ${produto.stock || 0} | Disponível: ${produto.available})`);
+                    }
+                });
+                
+                document.getElementById('val-estoque').innerText = alertasEstoque;
+                relatorioData.alertas = alertasEstoque;
+
+                // D. BUSCAR ATIVIDADES RECENTES DIRETAMENTE DO FIRESTORE
+                await renderRecentActivities();
+
+            } catch (error) {
+                console.error("Erro ao carregar dados do Firebase:", error);
+                document.getElementById('atividades-lista').innerHTML = `
+                    <div class="activity-item">
+                        <div class="activity-content">
+                            <div class="activity-title" style="color:red;">Erro ao atualizar dados estruturais. Verifique o console.</div>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        // =========================================
+        // PROCESSAMENTO DE ATIVIDADES RECENTES
+        // =========================================
+        async function renderRecentActivities() {
+            try {
+                const resRef = collection(db, "reservations");
+                // Obtém as últimas 4 atualizações de reservas de forma global
+                const q = query(resRef, orderBy("updatedAt", "desc"), limit(4));
+                const querySnapshot = await getDocs(q);
+                
+                const listaContainer = document.getElementById('atividades-lista');
+                
+                if (querySnapshot.empty) {
+                    listaContainer.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-dot"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Nenhuma atividade registrada no sistema.</div>
+                            </div>
+                        </div>`;
+                    return;
+                }
+
+                listaContainer.innerHTML = ""; // Limpa o carregando
+
+                querySnapshot.forEach((doc) => {
+                    const res = doc.data();
+                    let statusClass = "";
+                    let statusTxt = "";
+                    
+                    if (res.status === "completed") { statusClass = "completed"; statusTxt = "Finalizada"; }
+                    else if (res.status === "cancelled") { statusClass = "cancelled"; statusTxt = "Cancelada"; }
+                    else { statusTxt = "Recebida/Pendente"; }
+
+                    const dataHora = res.updatedAt ? res.updatedAt.toDate().toLocaleString('pt-BR') : "Agora";
+                    const clienteNome = res.userSnapshot?.name || "Visitante";
+
+                    const itemHTML = `
+                        <div class="activity-item">
+                            <div class="activity-dot ${statusClass}"></div>
+                            <div class="activity-content">
+                                <div class="activity-title">Reserva #${doc.id.substring(0,6)} - Status: ${statusTxt}</div>
+                                <div class="activity-time">Valor: R$ ${res.total?.toFixed(2)} • Cliente: ${clienteNome} • Atualizado em: ${dataHora}</div>
+                            </div>
+                        </div>
+                    `;
+                    listaContainer.innerHTML += itemHTML;
+                });
+
+            } catch (err) {
+                console.warn("Não foi possível carregar logs reais (Verifique as regras de index do Firestore):", err);
+                // Fallback amigável caso o índice composto do Firestore não esteja gerado
+                document.getElementById('atividades-lista').innerHTML = `
+                    <div class="activity-item"><div class="activity-dot completed"></div><div class="activity-content"><div class="activity-title">Sincronização de catálogo ativa</div><div class="activity-time">Aguardando novos checkouts na plataforma.</div></div></div>
+                `;
+            }
+        }
+
+        // =========================================
+        // GERAÇÃO DE RELATÓRIO TXT
+        // =========================================
+        window.emitirRelatorio = function() {
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const horaAtual = new Date().toLocaleTimeString('pt-BR');
+            
+            let textoProdutosAlerta = relatorioData.itensAlerta.length > 0 
+                ? relatorioData.itensAlerta.map(item => ` - ${item}`).join("\n")
+                : " Nenhuma inconformidade ou falta detectada.";
+
+            const relatorioTexto = `
+==================================================
+        RELATÓRIO GERENCIAL OFICIAL — M.E.U.
+==================================================
+Data de Emissão: ${dataAtual} às ${horaAtual}
+Emitido por perfil: Administrador autenticado
+
+--------------------------------------------------
+RESUMO FINANCEIRO (Vendas Concluídas Hoje)
+--------------------------------------------------
+Faturamento Bruto: ${relatorioData.totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+
+--------------------------------------------------
+CONTROLE DE OPERAÇÕES E AGENDAMENTOS
+--------------------------------------------------
+Reservas aguardando retirada (Pendentes): ${relatorioData.pendentes}
+
+--------------------------------------------------
+ALERTAS CRÍTICOS DE ESTOQUE E DISPONIBILIDADE
+--------------------------------------------------
+Produtos zerados ou marcados como Indisponíveis: ${relatorioData.alertas}
+Itens listados:
+${textoProdutosAlerta}
+
+--------------------------------------------------
+Fim do documento institucional.
+M.E.U. — Mercadinho Universitário S/A.
+==================================================
+            `;
+
+            const blob = new Blob([relatorioTexto], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Relatorio_Gerencial_MEU_${dataAtual.replace(/\//g, '-')}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    </script>
+</body>
+</html>
